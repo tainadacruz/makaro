@@ -42,24 +42,24 @@ percorrer array pos = array !! pos
 
 -- Bloco para ver se tem determinado número em uma região
 -- Função para checar quantas regiões a matriz tem
-convLine::array -> Int
-convLine (x:[]) = getRegion x
+convLine :: array -> Int
+convLine [(a,b,c,d)] = getRegion (a,b,c,d)
 convLine (x:xs) | ((getRegion x) > convLine xs) = getRegion x
                 | otherwise = convLine xs
 
-convMatrix::[array] -> Int
+convMatrix :: [array] -> Int
 convMatrix (x:[]) = convLine x
 convMatrix (x:xs) | (convLine x > convMatrix xs) = convLine x
                   | otherwise = convMatrix xs
 --tentativa 2
-convLine::array -> Int -> Int
-convLine _ 10 = 0
+convLine :: array -> Int -> Int
+convLine x 9 = (getRegion (percorrer x 9))
 convLine x indice | ((getRegion (percorrer x indice)) > convLine x indice+1) = (getRegion (percorrer x indice))
-           indice | otherwise = convLine x indice+1
+                  | otherwise = convLine x indice+1
 
-convMatrix::array -> Int -> Int
-convMatrix _ 10 = 0 
-convMatrix x indice | (convLine (percorrer x indice) > convMatrix x indice+1) = convLine (percorrer x indice)
+convMatrix :: array -> Int -> Int
+convMatrix x 8 = (convLine (percorrer x 8) 0)
+convMatrix x indice | ((convLine (percorrer x indice) 0) > convMatrix x indice+1) = convLine (percorrer x indice) 0
                     | otherwise = convMatrix x indice+1
 
 
@@ -68,6 +68,10 @@ main = do
     let linha_1 = percorrer makaro 0
     let elemento_5 = percorrer linha_1 4
     let valor = getValue elemento_5
+
+    let elemento_1 = percorrer linha_1 0
+    let regiao = getRegion elemento_1
+    print(regiao)
 
     let quantidade_regiao = convMatrix makaro 0
     print(quantidade_regiao)
