@@ -6,6 +6,7 @@ type Cell = (Int,Int,Int,Value) -- Definição >>>>> (Linha, Coluna, Região, Va
 type Row  = [Cell]
 type Grid = [Row]
 
+
 -- Para percorrer valores da tupla
 getRow :: (Int,Int,Int,Value) -> Int
 getRow (a,_,_,_) = a
@@ -18,7 +19,6 @@ getRegion (_,_,c,_) = c
 
 getValue :: (Int,Int,Int,Value) -> Value
 getValue (_,_,_,d) = d
-
 
 
 -- Matriz de sudoku 9x9, vai virar makaro 8x8
@@ -35,32 +35,23 @@ makaro =
     [(9,1,7,Possible [1..9]), (9,2,7,Possible [1..9]), (9,3,7,Possible [1..9]), (9,4,8,Fixed 8), (9,5,8,Possible [1..9]), (9,6,8,Fixed 6), (9,7,9,Possible [1..9]), (9,8,9,Possible [1..9]), (9,9,9,Possible [1..9])]]
 
 
-
 -- Função que retorna o elemento de um array em determinada posição
 percorrer array pos = array !! pos
 
-
 -- Bloco para ver se tem determinado número em uma região
 -- Função para checar quantas regiões a matriz tem
-convLine :: array -> Int
-convLine [(a,b,c,d)] = getRegion (a,b,c,d)
+-- Função para checar quantas regiões a matriz tem
+convLine :: Row -> Int
+convLine [] = 0
+convLine (x:[]) = getRegion x
 convLine (x:xs) | ((getRegion x) > convLine xs) = getRegion x
                 | otherwise = convLine xs
 
-convMatrix :: [array] -> Int
+convMatrix :: Grid -> Int
+convMatrix [] = 0
 convMatrix (x:[]) = convLine x
 convMatrix (x:xs) | (convLine x > convMatrix xs) = convLine x
                   | otherwise = convMatrix xs
---tentativa 2
-convLine :: array -> Int -> Int
-convLine x 9 = (getRegion (percorrer x 9))
-convLine x indice | ((getRegion (percorrer x indice)) > convLine x indice+1) = (getRegion (percorrer x indice))
-                  | otherwise = convLine x indice+1
-
-convMatrix :: array -> Int -> Int
-convMatrix x 8 = (convLine (percorrer x 8) 0)
-convMatrix x indice | ((convLine (percorrer x indice) 0) > convMatrix x indice+1) = convLine (percorrer x indice) 0
-                    | otherwise = convMatrix x indice+1
 
 
 -- Exemplo de acesso ao valor de uma tupla
@@ -73,6 +64,6 @@ main = do
     let regiao = getRegion elemento_1
     print(regiao)
 
-    let quantidade_regiao = convMatrix makaro 0
+    let quantidade_regiao = convMatrix makaro
     print(quantidade_regiao)
     print(valor)
