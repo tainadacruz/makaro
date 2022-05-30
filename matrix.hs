@@ -41,20 +41,11 @@ makaro =
     [(8,1,7,Possible [1..9]), (8,2,7,Fixed 5), (8,3,7,Possible [1..9]), (8,4,8,Fixed 1), (8,5,8,Possible [1..9]), (8,6,8,Possible [1..9]), (8,7,9,Fixed 2), (8,8,9,Possible [1..9]), (8,9,9,Possible [1..9])],
     [(9,1,7,Possible [1..9]), (9,2,7,Possible [1..9]), (9,3,7,Possible [1..9]), (9,4,8,Fixed 8), (9,5,8,Possible [1..9]), (9,6,8,Fixed 6), (9,7,9,Possible [1..9]), (9,8,9,Possible [1..9]), (9,9,9,Possible [1..9])]]
 
-makaro 
+makaro_pruned :: Grid
+makaro_pruned = []
 
 -- Função que retorna o elemento de um array em determinada posição
 percorrer array pos = array !! po
-
--- Função para mostrar a Grid com a lista de possibilidades
-showGridWithPossibilities :: Grid -> String
-showGridWithPossibilities = unlines . map (unwords . map showCell)
-  where
-    showCell (Fixed x)     = show x ++ "          "
-    showCell (Possible xs) =
-      (++ "]")
-      . Data.List.foldl' (\acc x -> acc ++ if x `elem` xs then show x else " ") "["
-      $ [1..9]
 
 -- Bloco para ver se tem determinado número em uma região
 -- Função para checar quantas regiões a matriz tem
@@ -93,39 +84,36 @@ getFixedValuesOf (x:xs) regiao lista = lista++(getFixedValuesOfLines x regiao []
 
 
 -- Precisa pegar o Value, mudar o Value, e retorna uma nova tupla com os valores atualizados
-ehIgual :: Int -> Bool
-ehIgual aluno = 
-        if (getNota aluno) == 6.0 then
-            True
-        else
+ehIgual :: Int -> Int -> Bool
+ehIgual aluno fixedValue = 
+        if (getNota aluno) == fixedValue then
             False
+        else
+            True
 
 filtrar :: (t -> Bool) -> [t] -> Int -> [t] 
-filtrar funcao lista ehIgualA = [a | a <- lista, funcao a ehIgualA]
+filtrar funcao lista fixedValue = [a | a <- lista, funcao a fixedValue]
 
 getCell :: Cell -> Int -> Cell
-getCell (a, b, c, d) regiao ehIgualA | (regiao == c) = (a, b, c, filtrar ehIgual d ehIgualA)
+getCell (a, b, c, d) regiao fixedValue | (regiao == c) = (a, b, c, filtrar ehIgual d fixedValue)
                                      | otherwise = (a, b, c, d)
 
-getiLine :: Row -> Int -> [Int] -> Row -> Row
-getiLine row regiao listaFixedValues novaRow = [(a, b, c, d) | (a, b, c, d) <- row, getCell (a, b, c, d) ]
-
-getiLine :: Row -> Int -> [Int] -> Row -> Row
-getiLine row regiao listaFixedValues novaRow = [getCell (a, b, c, d) | (a, b, c, d) <- row]
-
-getiLine :: Row -> Int -> [Int] -> Row -> Row
-getiLine row regiao listaFixedValues novaRow = 
+getiLine :: Row -> Int -> Int -> Row
+getiLine (x:[]) regiao fixedValue = [(getCell x regiao fixedValue)]
+getiLine (x:xs) regiao fixedValue = [(getCell x regiao fixedValue):[]] ++ [getiLine xs regiao fixedValue]
 
 -- retorna nova matriz com a lista de possibilidades atualizadas para uma região
-getMatrix :: Grid 
+getMatrix :: Grid -> Int -> Int -> Grid
+getMatrix (x:[]) regiao fixedValue = [(getiLine x regiao getFixedValue)]
+getMatrix (x:xs) regiao fixedValue = [(getiLine x regiao getFixedValue):[]] ++ [getMatrix xs regiao fixedValue] 
 
-deleteFixedValuesOfRegions :: Grid -> Int -> [Int] -> [Int]
-deleteFixedValuesOfRegions grid regiao listaFixedValues = 
+deleteFixedValuesOfRegions :: Grid -> Int -> [Int] -> Grid
+deleteFixedValuesOfRegions grid regiao (x:[]) = getMatrix grid regiao x
+deleteFixedValuesOfRegions grid regiao (x:xs) = deleteFixedValuesOfRegions (getMatrix grid regiao x) regiao xs
 
-getFixedValuesOfRegions :: Grid -> Int -> [Grid] -> [Grid]
-amountOfRegions grid amountRegions = deleteFixedValuesOfRegions (getFixedValuesOf grid amountRegions [])
-
-
+getFixedValuesOfRegions :: Grid -> Int -> Grid
+getFixedValuesOfRegions grid 1 = (deleteFixedValuesOfRegions grid amountOfRegions (getFixedValuesOf grid amountRegions []))
+getFixedValuesOfRegions grid amountOfRegions = getFixedValuesOfRegions (deleteFixedValuesOfRegions grid amountOfRegions (getFixedValuesOf grid amountRegions [])) (amountOfRegions-1)
 
 
 
@@ -135,6 +123,7 @@ main = do
     let linha_1 = percorrer makaro 0
     let elemento_5 = percorrer linha_1 4
     let valor = getValue elemento_5
+    print(valor)
 
     let elemento_1 = percorrer linha_1 0
     let regiao = getRegion elemento_1
@@ -142,4 +131,7 @@ main = do
 
     let quantidade_regiao = amountOfRegions makaro
     print(quantidade_regiao)
-    print(valor)
+    
+    let elemento_1 = percorrer linha_1 0
+    let regiao = getValue elemento_1
+    print(regiao)
