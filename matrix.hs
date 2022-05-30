@@ -28,6 +28,7 @@ getFixedValue :: Value -> Int
 getFixedValue (Fixed x) = x
 
 getPossibleValue :: Value -> [Int]
+getPossibleValue (Fixed x) = [x]
 getPossibleValue (Possible x) = x
 
 -- Matriz de sudoku 9x9, vai virar makaro 8x8
@@ -108,7 +109,7 @@ filtrar funcao lista fixedValues = [a | a <- lista, funcao a fixedValues]
 
 
 getCell :: Cell -> Int -> [Int] -> Cell
-getCell (a, b, c, d) regiao fixedValues | (regiao == c && (isFixed (getValue (a,b,c,d)))) = (a, b, c, Possible (filtrar ehIgual (getPossibleValue d) fixedValues))
+getCell (a, b, c, d) regiao fixedValues | (regiao == c && (isFixed (getValue (a,b,c,d)))==False) = (a, b, c, Possible (filtrar ehIgual (getPossibleValue d) fixedValues))
                                         | otherwise = (a, b, c, d)
 
 getiLine :: Row -> Int -> [Int] -> Row
@@ -135,11 +136,9 @@ main = do
     let elemento_5 = percorrer linha_1 4
     let valor = getValue elemento_5
     print(valor)
-
     let elemento_1 = percorrer linha_1 0
     let regiao = getRegion elemento_1
     print(regiao)
-
     let quantidade_regiao = amountOfRegions makaro
     print(quantidade_regiao)
     
@@ -157,3 +156,4 @@ main = do
     let elemento = percorrer linha 0
     let valor_2 = getValue elemento
     print(valor_2)
+    print(makaro_pruned)
