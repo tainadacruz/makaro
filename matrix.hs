@@ -27,6 +27,8 @@ isFixed (Possible _) = False
 getFixedValue :: Value -> Int
 getFixedValue (Fixed x) = x
 
+getPossibleValue :: Value -> [Int]
+getPossibleValue (Possible x) = x
 
 -- Matriz de sudoku 9x9, vai virar makaro 8x8
 makaro :: Grid
@@ -45,7 +47,7 @@ makaro_pruned :: Grid
 makaro_pruned = []
 
 -- Função que retorna o elemento de um array em determinada posição
-percorrer array pos = array !! po
+percorrer array pos = array !! pos
 
 -- Bloco para ver se tem determinado número em uma região
 -- Função para checar quantas regiões a matriz tem
@@ -53,13 +55,13 @@ convLineRegion :: Row -> Int
 convLineRegion [] = 0
 convLineRegion (x:[]) = getRegion x
 convLineRegion (x:xs) | ((getRegion x) > convLineRegion xs) = getRegion x
-                | otherwise = convLineRegion xs
+                      | otherwise = convLineRegion xs
 
 convMatrixRegion :: Grid -> Int
 convMatrixRegion [] = 0
 convMatrixRegion (x:[]) = convLineRegion x
 convMatrixRegion (x:xs) | (convLineRegion x > convMatrixRegion xs) = convLineRegion x
-                  | otherwise = convMatrixRegion xs
+                        | otherwise = convMatrixRegion xs
 
 amountOfRegions :: Grid -> Int
 amountOfRegions x = convMatrixRegion x
@@ -72,48 +74,59 @@ amountOfRegions x = convMatrixRegion x
 getFixedValuesOfLines :: Row -> Int -> [Int] -> [Int]
 getFixedValuesOfLines [] _ _ = []
 getFixedValuesOfLines (x:[]) regiao lista | (isFixed (getValue x) && (getRegion x == regiao)) = [(getFixedValue (getValue x))]
-                             | otherwise = []
-getFixedValuesOfLines (x:xs) regiao lista | (isFixed (getValue x) && (getRegion x == regiao)) = getFixedValuesOfLines xs (lista++(getFixedValue (getValue x)))
-                             | otherwise = getFixedValuesOfLines xs lista
+                                          | otherwise = []
+getFixedValuesOfLines (x:xs) regiao lista | (isFixed (getValue x) && (getRegion x == regiao)) = getFixedValuesOfLines xs regiao (lista++((getFixedValue (getValue x)):[]))
+                                          | otherwise = getFixedValuesOfLines xs regiao lista
+
+--getFixedValuesOfLines (x:xs) regiao lista 
+--                            | ((isFixed (getValue x)) && (getRegion x == regiao) && (xs != [])) = getFixedValuesOfLines xs (lista++((getFixedValue (getValue x)):[]))
+--                            | ((isFixed (getValue x)) && (getRegion x == regiao) && (xs == [])) = [(getFixedValue (getValue x))]
+--                            | (xs != []) = getFixedValuesOfLines xs lista
+--                            | otherwise = []
 
 getFixedValuesOfMatrix :: Grid -> Int -> [Int] -> [Int]
-getFixedValuesOf [] _ _ = []
-getFixedValuesOf (x:[]) regiao lista = lista++(getFixedValuesOfLines x regiao [])
-getFixedValuesOf (x:xs) regiao lista = lista++(getFixedValuesOfLines x regiao [])++(getFixedValuesOf xs regiao lista)
+getFixedValuesOfMatrix [] _ _ = []
+getFixedValuesOfMatrix (x:[]) regiao lista = lista++(getFixedValuesOfLines x regiao [])
+getFixedValuesOfMatrix (x:xs) regiao lista = lista++(getFixedValuesOfLines x regiao [])++(getFixedValuesOfMatrix xs regiao lista)
 -- retrna lista de valores fixos para uma região
 
 
 -- Precisa pegar o Value, mudar o Value, e retorna uma nova tupla com os valores atualizados
-ehIgual :: Int -> Int -> Bool
-ehIgual aluno fixedValue = 
-        if (getNota aluno) == fixedValue then
+ehIgual :: Int -> [Int] -> Bool
+ehIgual x fixedValues = 
+        if x `elem` fixedValues then
             False
         else
             True
 
-filtrar :: (t -> Bool) -> [t] -> Int -> [t] 
-filtrar funcao lista fixedValue = [a | a <- lista, funcao a fixedValue]
+mapear :: Value -> [Int] 
+mapear (Possible a) = a
 
-getCell :: Cell -> Int -> Cell
-getCell (a, b, c, d) regiao fixedValue | (regiao == c) = (a, b, c, filtrar ehIgual d fixedValue)
-                                     | otherwise = (a, b, c, d)
+filtrar :: (Int -> [Int] -> Bool) -> [Int] -> [Int] -> [Int]
+--filtrar funcao lista fixedValues = filter (funcao fixedValues) lista
+filtrar funcao lista fixedValues = [a | a <- lista, funcao a fixedValues]
+--myfunc aList x1 x2 x3 x4 x5 x6 = filter (myPredicate x1 x2 x3 x4 x5 x6) alist
 
-getiLine :: Row -> Int -> Int -> Row
-getiLine (x:[]) regiao fixedValue = [(getCell x regiao fixedValue)]
-getiLine (x:xs) regiao fixedValue = [(getCell x regiao fixedValue):[]] ++ [getiLine xs regiao fixedValue]
+
+getCell :: Cell -> Int -> [Int] -> Cell
+getCell (a, b, c, d) regiao fixedValues | (regiao == c) = (a, b, c, Possible (filtrar ehIgual (mapear d) fixedValues))
+                                        | otherwise = (a, b, c, d)
+
+getiLine :: Row -> Int -> [Int] -> Row
+getiLine (x:[]) regiao fixedValues = (getCell x regiao fixedValues):[]
+getiLine (x:xs) regiao fixedValues = ((getCell x regiao fixedValues):[]) ++ (getiLine xs regiao fixedValues)
 
 -- retorna nova matriz com a lista de possibilidades atualizadas para uma região
-getMatrix :: Grid -> Int -> Int -> Grid
-getMatrix (x:[]) regiao fixedValue = [(getiLine x regiao getFixedValue)]
-getMatrix (x:xs) regiao fixedValue = [(getiLine x regiao getFixedValue):[]] ++ [getMatrix xs regiao fixedValue] 
+getMatrix :: Grid -> Int -> [Int] -> Grid
+getMatrix (x:[]) regiao fixedValues = (getiLine x regiao fixedValues):[]
+getMatrix (x:xs) regiao fixedValues = ((getiLine x regiao fixedValues):[]) ++ (getMatrix xs regiao fixedValues)
 
 deleteFixedValuesOfRegions :: Grid -> Int -> [Int] -> Grid
-deleteFixedValuesOfRegions grid regiao (x:[]) = getMatrix grid regiao x
-deleteFixedValuesOfRegions grid regiao (x:xs) = deleteFixedValuesOfRegions (getMatrix grid regiao x) regiao xs
+deleteFixedValuesOfRegions grid regiao fixedValues = getMatrix grid regiao fixedValues
 
 getFixedValuesOfRegions :: Grid -> Int -> Grid
-getFixedValuesOfRegions grid 1 = (deleteFixedValuesOfRegions grid amountOfRegions (getFixedValuesOf grid amountRegions []))
-getFixedValuesOfRegions grid amountOfRegions = getFixedValuesOfRegions (deleteFixedValuesOfRegions grid amountOfRegions (getFixedValuesOf grid amountRegions [])) (amountOfRegions-1)
+getFixedValuesOfRegions grid 1 = (deleteFixedValuesOfRegions grid 1 (getFixedValuesOfMatrix grid 1 []))
+getFixedValuesOfRegions grid amountRegions = getFixedValuesOfRegions (deleteFixedValuesOfRegions grid amountRegions (getFixedValuesOfMatrix grid amountRegions [])) (amountRegions-1)
 
 
 
