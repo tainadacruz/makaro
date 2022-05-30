@@ -43,8 +43,18 @@ makaro =
     [(8,1,7,Possible [1..9]), (8,2,7,Fixed 5), (8,3,7,Possible [1..9]), (8,4,8,Fixed 1), (8,5,8,Possible [1..9]), (8,6,8,Possible [1..9]), (8,7,9,Fixed 2), (8,8,9,Possible [1..9]), (8,9,9,Possible [1..9])],
     [(9,1,7,Possible [1..9]), (9,2,7,Possible [1..9]), (9,3,7,Possible [1..9]), (9,4,8,Fixed 8), (9,5,8,Possible [1..9]), (9,6,8,Fixed 6), (9,7,9,Possible [1..9]), (9,8,9,Possible [1..9]), (9,9,9,Possible [1..9])]]
 
-makaro_pruned :: Grid
-makaro_pruned = []
+-- _ _ _ _ _ _ _ 1 _
+-- 4 _ _ _ _ _ _ _ _
+-- _ 2 _ _ _ _ _ _ _
+-- _ _ _ _ 5 _ 4 _ 7
+-- _ _ 8 _ _ _ 3 _ _
+-- _ _ 1 _ 9 _ _ _ _
+-- 3 _ _ 4 _ _ _ _ _
+-- _ 5 _ 1 _ _ 2 _ _
+-- _ _ _ 8 _ 6 _ _ _
+
+--makaro_pruned :: Grid
+--makaro_pruned = []
 
 -- Função que retorna o elemento de um array em determinada posição
 percorrer array pos = array !! pos
@@ -71,23 +81,15 @@ amountOfRegions x = convMatrixRegion x
 
 -- Função para checar os números fixos de cada região
 -- ver se cada valor é numero fixo, e se for numero fixo, adicionar na lista
-getFixedValuesOfLines :: Row -> Int -> [Int] -> [Int]
-getFixedValuesOfLines [] _ _ = []
-getFixedValuesOfLines (x:[]) regiao lista | (isFixed (getValue x) && (getRegion x == regiao)) = [(getFixedValue (getValue x))]
-                                          | otherwise = []
-getFixedValuesOfLines (x:xs) regiao lista | (isFixed (getValue x) && (getRegion x == regiao)) = getFixedValuesOfLines xs regiao (lista++((getFixedValue (getValue x)):[]))
-                                          | otherwise = getFixedValuesOfLines xs regiao lista
+getFixedValuesOfLines :: Row -> Int -> [Int]
+getFixedValuesOfLines (x:[]) regiao | (isFixed (getValue x) && (getRegion x == regiao)) = (getFixedValue (getValue x)):[]
+                                    | otherwise = []
+getFixedValuesOfLines (x:xs) regiao | (isFixed (getValue x) && (getRegion x == regiao)) = ((getFixedValue (getValue x)):[]) ++ (getFixedValuesOfLines xs regiao)
+                                    | otherwise = (getFixedValuesOfLines xs regiao)
 
---getFixedValuesOfLines (x:xs) regiao lista 
---                            | ((isFixed (getValue x)) && (getRegion x == regiao) && (xs != [])) = getFixedValuesOfLines xs (lista++((getFixedValue (getValue x)):[]))
---                            | ((isFixed (getValue x)) && (getRegion x == regiao) && (xs == [])) = [(getFixedValue (getValue x))]
---                            | (xs != []) = getFixedValuesOfLines xs lista
---                            | otherwise = []
-
-getFixedValuesOfMatrix :: Grid -> Int -> [Int] -> [Int]
-getFixedValuesOfMatrix [] _ _ = []
-getFixedValuesOfMatrix (x:[]) regiao lista = lista++(getFixedValuesOfLines x regiao [])
-getFixedValuesOfMatrix (x:xs) regiao lista = lista++(getFixedValuesOfLines x regiao [])++(getFixedValuesOfMatrix xs regiao lista)
+getFixedValuesOfMatrix :: Grid -> Int -> [Int]
+getFixedValuesOfMatrix (x:[]) regiao = (getFixedValuesOfLines x regiao)
+getFixedValuesOfMatrix (x:xs) regiao = (getFixedValuesOfLines x regiao)++(getFixedValuesOfMatrix xs regiao)
 -- retrna lista de valores fixos para uma região
 
 
@@ -99,9 +101,6 @@ ehIgual x fixedValues =
         else
             True
 
-mapear :: Value -> [Int] 
-mapear (Possible a) = a
-
 filtrar :: (Int -> [Int] -> Bool) -> [Int] -> [Int] -> [Int]
 --filtrar funcao lista fixedValues = filter (funcao fixedValues) lista
 filtrar funcao lista fixedValues = [a | a <- lista, funcao a fixedValues]
@@ -109,7 +108,7 @@ filtrar funcao lista fixedValues = [a | a <- lista, funcao a fixedValues]
 
 
 getCell :: Cell -> Int -> [Int] -> Cell
-getCell (a, b, c, d) regiao fixedValues | (regiao == c) = (a, b, c, Possible (filtrar ehIgual (mapear d) fixedValues))
+getCell (a, b, c, d) regiao fixedValues | (regiao == c && (isFixed (getValue (a,b,c,d)))) = (a, b, c, Possible (filtrar ehIgual (getPossibleValue d) fixedValues))
                                         | otherwise = (a, b, c, d)
 
 getiLine :: Row -> Int -> [Int] -> Row
@@ -125,15 +124,14 @@ deleteFixedValuesOfRegions :: Grid -> Int -> [Int] -> Grid
 deleteFixedValuesOfRegions grid regiao fixedValues = getMatrix grid regiao fixedValues
 
 getFixedValuesOfRegions :: Grid -> Int -> Grid
-getFixedValuesOfRegions grid 1 = (deleteFixedValuesOfRegions grid 1 (getFixedValuesOfMatrix grid 1 []))
-getFixedValuesOfRegions grid amountRegions = getFixedValuesOfRegions (deleteFixedValuesOfRegions grid amountRegions (getFixedValuesOfMatrix grid amountRegions [])) (amountRegions-1)
-
+getFixedValuesOfRegions grid 1 = (deleteFixedValuesOfRegions grid 1 (getFixedValuesOfMatrix grid 1))
+getFixedValuesOfRegions grid amountRegions = getFixedValuesOfRegions (deleteFixedValuesOfRegions grid amountRegions (getFixedValuesOfMatrix grid amountRegions)) (amountRegions-1)
 
 
 
 -- Exemplo de acesso ao valor de uma tupla
 main = do
-    let linha_1 = percorrer makaro 0
+    {-let linha_1 = percorrer makaro 0
     let elemento_5 = percorrer linha_1 4
     let valor = getValue elemento_5
     print(valor)
@@ -147,4 +145,15 @@ main = do
     
     let elemento_1 = percorrer linha_1 0
     let regiao = getValue elemento_1
-    print(regiao)
+    print(regiao)-}
+
+    let linha_1 = percorrer makaro 1
+    let elemento_5 = percorrer linha_1 0
+    let valor = getValue elemento_5
+    print(valor)
+
+    let makaro_pruned = getFixedValuesOfRegions makaro (amountOfRegions makaro)
+    let linha = percorrer makaro_pruned 1
+    let elemento = percorrer linha 0
+    let valor_2 = getValue elemento
+    print(valor_2)
