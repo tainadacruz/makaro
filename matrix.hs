@@ -20,6 +20,13 @@ getRegion (_,_,c,_) = c
 getValue :: (Int,Int,Int,Value) -> Value
 getValue (_,_,_,d) = d
 
+isFixed :: Value -> Bool
+isFixed (Fixed _) = True
+isFixed (Possible _) = False
+
+getFixedValue :: Value -> Int
+getFixedValue (Fixed x) = x
+
 
 -- Matriz de sudoku 9x9, vai virar makaro 8x8
 makaro :: Grid
@@ -34,24 +41,93 @@ makaro =
     [(8,1,7,Possible [1..9]), (8,2,7,Fixed 5), (8,3,7,Possible [1..9]), (8,4,8,Fixed 1), (8,5,8,Possible [1..9]), (8,6,8,Possible [1..9]), (8,7,9,Fixed 2), (8,8,9,Possible [1..9]), (8,9,9,Possible [1..9])],
     [(9,1,7,Possible [1..9]), (9,2,7,Possible [1..9]), (9,3,7,Possible [1..9]), (9,4,8,Fixed 8), (9,5,8,Possible [1..9]), (9,6,8,Fixed 6), (9,7,9,Possible [1..9]), (9,8,9,Possible [1..9]), (9,9,9,Possible [1..9])]]
 
+makaro 
 
 -- Função que retorna o elemento de um array em determinada posição
-percorrer array pos = array !! pos
+percorrer array pos = array !! po
+
+-- Função para mostrar a Grid com a lista de possibilidades
+showGridWithPossibilities :: Grid -> String
+showGridWithPossibilities = unlines . map (unwords . map showCell)
+  where
+    showCell (Fixed x)     = show x ++ "          "
+    showCell (Possible xs) =
+      (++ "]")
+      . Data.List.foldl' (\acc x -> acc ++ if x `elem` xs then show x else " ") "["
+      $ [1..9]
 
 -- Bloco para ver se tem determinado número em uma região
 -- Função para checar quantas regiões a matriz tem
--- Função para checar quantas regiões a matriz tem
-convLine :: Row -> Int
-convLine [] = 0
-convLine (x:[]) = getRegion x
-convLine (x:xs) | ((getRegion x) > convLine xs) = getRegion x
-                | otherwise = convLine xs
+convLineRegion :: Row -> Int
+convLineRegion [] = 0
+convLineRegion (x:[]) = getRegion x
+convLineRegion (x:xs) | ((getRegion x) > convLineRegion xs) = getRegion x
+                | otherwise = convLineRegion xs
 
-convMatrix :: Grid -> Int
-convMatrix [] = 0
-convMatrix (x:[]) = convLine x
-convMatrix (x:xs) | (convLine x > convMatrix xs) = convLine x
-                  | otherwise = convMatrix xs
+convMatrixRegion :: Grid -> Int
+convMatrixRegion [] = 0
+convMatrixRegion (x:[]) = convLineRegion x
+convMatrixRegion (x:xs) | (convLineRegion x > convMatrixRegion xs) = convLineRegion x
+                  | otherwise = convMatrixRegion xs
+
+amountOfRegions :: Grid -> Int
+amountOfRegions x = convMatrixRegion x
+
+
+
+
+-- Função para checar os números fixos de cada região
+-- ver se cada valor é numero fixo, e se for numero fixo, adicionar na lista
+getFixedValuesOfLines :: Row -> Int -> [Int] -> [Int]
+getFixedValuesOfLines [] _ _ = []
+getFixedValuesOfLines (x:[]) regiao lista | (isFixed (getValue x) && (getRegion x == regiao)) = [(getFixedValue (getValue x))]
+                             | otherwise = []
+getFixedValuesOfLines (x:xs) regiao lista | (isFixed (getValue x) && (getRegion x == regiao)) = getFixedValuesOfLines xs (lista++(getFixedValue (getValue x)))
+                             | otherwise = getFixedValuesOfLines xs lista
+
+getFixedValuesOfMatrix :: Grid -> Int -> [Int] -> [Int]
+getFixedValuesOf [] _ _ = []
+getFixedValuesOf (x:[]) regiao lista = lista++(getFixedValuesOfLines x regiao [])
+getFixedValuesOf (x:xs) regiao lista = lista++(getFixedValuesOfLines x regiao [])++(getFixedValuesOf xs regiao lista)
+-- retrna lista de valores fixos para uma região
+
+
+-- Precisa pegar o Value, mudar o Value, e retorna uma nova tupla com os valores atualizados
+ehIgual :: Int -> Bool
+ehIgual aluno = 
+        if (getNota aluno) == 6.0 then
+            True
+        else
+            False
+
+filtrar :: (t -> Bool) -> [t] -> Int -> [t] 
+filtrar funcao lista ehIgualA = [a | a <- lista, funcao a ehIgualA]
+
+getCell :: Cell -> Int -> Cell
+getCell (a, b, c, d) regiao ehIgualA | (regiao == c) = (a, b, c, filtrar ehIgual d ehIgualA)
+                                     | otherwise = (a, b, c, d)
+
+getiLine :: Row -> Int -> [Int] -> Row -> Row
+getiLine row regiao listaFixedValues novaRow = [(a, b, c, d) | (a, b, c, d) <- row, getCell (a, b, c, d) ]
+
+getiLine :: Row -> Int -> [Int] -> Row -> Row
+getiLine row regiao listaFixedValues novaRow = [getCell (a, b, c, d) | (a, b, c, d) <- row]
+
+getiLine :: Row -> Int -> [Int] -> Row -> Row
+getiLine row regiao listaFixedValues novaRow = 
+
+-- retorna nova matriz com a lista de possibilidades atualizadas para uma região
+getMatrix :: Grid 
+
+deleteFixedValuesOfRegions :: Grid -> Int -> [Int] -> [Int]
+deleteFixedValuesOfRegions grid regiao listaFixedValues = 
+
+getFixedValuesOfRegions :: Grid -> Int -> [Grid] -> [Grid]
+amountOfRegions grid amountRegions = deleteFixedValuesOfRegions (getFixedValuesOf grid amountRegions [])
+
+
+
+
 
 
 -- Exemplo de acesso ao valor de uma tupla
@@ -64,6 +140,6 @@ main = do
     let regiao = getRegion elemento_1
     print(regiao)
 
-    let quantidade_regiao = convMatrix makaro
+    let quantidade_regiao = amountOfRegions makaro
     print(quantidade_regiao)
     print(valor)
