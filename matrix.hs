@@ -79,6 +79,8 @@ makaro =
     [(8,1,14,Fixed 3),         (8,2,14,Possible [1..5]), (8,3,14,Fixed 4),         (8,4,13,Possible [1..3]), (8,5,12,Possible [1..2]), (8,6,11,Fixed 1),         (8,7,11,Possible [1..2]), (8,8,0,Arrow 4)]]
 
 
+linhas = 8
+colunas = 8
 
 -- Função que retorna o elemento de um array em determinada posição
 percorrer array pos = array !! pos
@@ -144,16 +146,17 @@ getMatrix (x:xs) regiao fixedValues = ((getiLine x regiao fixedValues):[]) ++ (g
 deleteFixedValuesOfRegions :: Grid -> Int -> [Int] -> Grid
 deleteFixedValuesOfRegions grid regiao fixedValues = getMatrix grid regiao fixedValues
 
-getFixedValuesOfRegions :: Grid -> Int -> Grid
-getFixedValuesOfRegions grid 1 = (deleteFixedValuesOfRegions grid 1 (getFixedValuesOfMatrix grid 1))
-getFixedValuesOfRegions grid amountRegions = getFixedValuesOfRegions (deleteFixedValuesOfRegions grid amountRegions (getFixedValuesOfMatrix grid amountRegions)) (amountRegions-1)
+pruningCellPossibilities :: Grid -> Int -> Grid
+pruningCellPossibilities grid 1 = (deleteFixedValuesOfRegions grid 1 (getFixedValuesOfMatrix grid 1))
+pruningCellPossibilities grid amountRegions = pruningCellPossibilities (deleteFixedValuesOfRegions grid amountRegions (getFixedValuesOfMatrix grid amountRegions)) (amountRegions-1)
 
 
 
 -- Bloco para checar se as listas de possibilidades possuem apenas uma possibilidade, para torná-la Fixed
 hasOneValue :: Value -> Bool
-hasOneValue (Possible (x:xs)) | (xs == []) = True
-                              | otherwise = False  
+hasOneValue (Possible ([])) = False
+hasOneValue (Possible (x:[])) = True
+hasOneValue (Possible (x:xs)) = False
 hasOneValue (Fixed _) = False
 hasOneValue (Arrow _) = False
 hasOneValue (Black) = False
@@ -165,7 +168,7 @@ returnValue (Arrow _) = 0
 returnValue (Black) = 0
 
 transformCells :: Cell -> Cell
-transformCells (a, b, c, d) | (hasOneValue d) = (a, b, c, Fixed (returnValue d))
+transformCells (a, b, c, d) | ((isPossible d) && (hasOneValue d)) = (a, b, c, Fixed (returnValue d))
                             | otherwise = (a, b, c, d)
 
 transformLines :: Row -> Row
@@ -178,6 +181,86 @@ transformMatrix (x:xs) = ((transformLines x):[]) ++ (transformMatrix xs)
 
 transformOnePossibilityLists :: Grid -> Grid
 transformOnePossibilityLists grid = transformMatrix grid
+
+
+
+-- Bloco para checar as possibilidades de acordo com as regras (por exemplo, não pode haver números adjacentes)
+
+genericVerificationLine :: Int -> Int -> Grid -> [Int]
+genericVerificationLine y x = 
+
+genericVerificationColumn :: Int -> Int -> Grid -> [Int]
+genericVerificationColumn y x = 
+
+genericVerification :: Int -> Int -> Grid -> [Int]
+genericVerification y x = 
+
+verifyLeftTopCornerCell :: Int -> Int -> Grid -> [Int]
+verifyLeftTopCornerCell
+
+verifyRightTopCornerCell :: Int -> Int -> Grid -> [Int]
+
+verifyRightBottomCornerCell :: Int -> Int -> Grid -> [Int]
+
+verifyLeftBottomCornerCell :: Int -> Int -> Grid -> [Int]
+
+verifyBottomLineCell :: Int -> Int -> Grid -> [Int]
+
+verifyTopLineCell :: Int -> Int -> Grid -> [Int]
+
+verifyLeftLineCell :: Int -> Int -> Grid -> [Int]
+
+verifyRightLineCell :: Int -> Int -> Grid -> [Int]
+
+verifyMidCell :: Int -> Int -> Grid -> [Int]
+
+verifyCell :: Cell -> Grid -> Cell
+verifyCell (a, b, c, d) grid = if a <= 1 then
+                                    (if b == 1 then
+
+                                     else
+                                        (if b == 8 then
+
+                                         else
+                                            )
+                                     
+                                        )
+                                 else
+                                    (if a == 8 then
+                                        (if b == 1 then
+
+                                        else
+                                            (if b == 8 then
+
+                                            else
+                                                )
+                                     
+                                        )
+                                    else
+                                        (if b == 1 then
+
+                                        else
+                                            (if b == 8 then
+
+                                            else
+                                                )
+                                     
+                                        )
+                                    ) 
+
+
+verifyLine :: Row -> Int -> Grid -> Row
+verifyLine (x:[]) grid = (verifyCell x grid):[]
+verifyLine (x:xs) grid = ((verifyCell x grid):[]) ++ (verifyLine xs grid)
+
+verifyMatrix :: Grid -> Int -> Grid -> Grid
+verifyMatrix (x:[]) grid = (verifyLine x grid):[]
+verifyMatrix (x:xs) grid = ((verifyLine x grid):[]) ++ (verifyMatrix xs grid)
+
+verifyOrthogonallyAdjacency :: Grid -> Grid
+verifyOrthogonallyAdjacency grid = verifyMatrix grid grid
+
+
 
 
 
@@ -201,15 +284,17 @@ main = do
     let valor = getValue elemento_5
     print(valor)
 
-    let sudoku_pruned = getFixedValuesOfRegions sudoku (amountOfRegions sudoku)
+    let sudoku_pruned = pruningCellPossibilities sudoku (amountOfRegions sudoku)
     let linha = percorrer sudoku_pruned 1
     let elemento = percorrer linha 0
     let valor_2 = getValue elemento
     print(valor_2)
     print(sudoku_pruned) -}
 
-    let makaro_pruned = getFixedValuesOfRegions makaro (amountOfRegions makaro) 
+    let quantityOfRegions = amountOfRegions makaro
+
+    let makaro_pruned = pruningCellPossibilities makaro quantityOfRegions
     print(makaro_pruned)
 
     let makaro_pruned2 = transformOnePossibilityLists makaro_pruned
-    print(makaro_pruned)
+    print(makaro_pruned2)
