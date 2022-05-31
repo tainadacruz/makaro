@@ -250,9 +250,22 @@ verificarAdjacentsOfArrow (a, b, c, d) grid = if a <= 1 then
                                             )
                                         )
 
+arrowsDirectionVerificationCell :: Cell -> [Int]
+arrowsDirectionVerificationCell (a, b, c, d) | (isFixed d) = (getFixedValue d):[]
+                                             | otherwise = []
+
+arrowsDirectionVerificationFunction :: Grid -> Int -> Int -> [Int]
+arrowsDirectionVerificationFunction grid a b = (arrowsDirectionVerificationCell (percorrer (percorrer grid (a-1)) (b-1)))
+
+verificarMaiorValorDirecaoArrow :: Cell -> Grid -> [Int]
+verificarMaiorValorDirecaoArrow (a, b, c, d) grid | ((getArrowValue d) == 1) = (arrowsDirectionVerificationFunction grid a (b+1))
+                                                  | ((getArrowValue d) == 2) = (arrowsDirectionVerificationFunction grid (a+1) b)
+                                                  | ((getArrowValue d) == 3) = (arrowsDirectionVerificationFunction grid a (b-1))
+                                                  | ((getArrowValue d) == 4) = (arrowsDirectionVerificationFunction grid (a-1) b)
+
 getArrowDirection :: Cell -> Int -> Grid -> [Int]
 getArrowDirection (a, b, c, d) direcao grid | ((getArrowValue d) == direcao) = verificarAdjacentsOfArrow (a,b,c,d) grid
-                                            | otherwise = []
+                                            | otherwise = verificarMaiorValorDirecaoArrow (a,b,c,d) grid
 
 genericVerificationCell :: Cell -> Int -> Grid -> [Int]
 genericVerificationCell (a, b, c, d) direcao grid | (isFixed d) = (getFixedValue d):[]
