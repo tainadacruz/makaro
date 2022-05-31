@@ -84,6 +84,7 @@ makaro =
 percorrer array pos = array !! pos
 
 
+
 -- Bloco para ver se tem determinado número em uma região
 -- Função para checar quantas regiões a matriz tem
 convLineRegion :: Row -> Int
@@ -100,6 +101,7 @@ convMatrixRegion (x:xs) | (convLineRegion x > convMatrixRegion xs) = convLineReg
 
 amountOfRegions :: Grid -> Int
 amountOfRegions x = convMatrixRegion x
+
 
 
 -- Bloco para checar os números fixos de cada região e retirar da lista de possibilidades
@@ -148,6 +150,36 @@ getFixedValuesOfRegions grid amountRegions = getFixedValuesOfRegions (deleteFixe
 
 
 
+-- Bloco para checar se as listas de possibilidades possuem apenas uma possibilidade, para torná-la Fixed
+hasOneValue :: Value -> Bool
+hasOneValue (Possible (x:xs)) | (xs == []) = True
+                              | otherwise = False  
+hasOneValue (Fixed _) = False
+hasOneValue (Arrow _) = False
+hasOneValue (Black) = False
+
+returnValue :: Value -> Int
+returnValue (Possible (x:xs)) = x
+returnValue (Fixed _) = 0
+returnValue (Arrow _) = 0
+returnValue (Black) = 0
+
+transformCells :: Cell -> Cell
+transformCells (a, b, c, d) | (hasOneValue d) = (a, b, c, Fixed (returnValue d))
+                            | otherwise = (a, b, c, d)
+
+transformLines :: Row -> Row
+transformLines (x:[]) = (transformCells x):[]
+transformLines (x:xs) = ((transformCells x):[]) ++ (transformLines xs)
+
+transformMatrix :: Grid -> Grid
+transformMatrix (x:[]) = (transformLines x):[]
+transformMatrix (x:xs) = ((transformLines x):[]) ++ (transformMatrix xs)
+
+transformOnePossibilityLists :: Grid -> Grid
+transformOnePossibilityLists grid = transformMatrix grid
+
+
 
 main = do
     {-let linha_1 = percorrer sudoku 0
@@ -177,4 +209,7 @@ main = do
     print(sudoku_pruned) -}
 
     let makaro_pruned = getFixedValuesOfRegions makaro (amountOfRegions makaro) 
+    print(makaro_pruned)
+
+    let makaro_pruned2 = transformOnePossibilityLists makaro_pruned
     print(makaro_pruned)
