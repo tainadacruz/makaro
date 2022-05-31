@@ -32,6 +32,12 @@ isFixed (Possible _) = False
 isFixed (Arrow _) = False
 isFixed (Black) = False
 
+isArrow :: Value -> Bool
+isArrow (Fixed _) = False
+isArrow (Possible _) = False
+isArrow (Arrow _) = True
+isArrow (Black) = False
+
 getFixedValue :: Value -> Int
 getFixedValue (Fixed x) = x
 getFixedValue (Possible _) = 0
@@ -43,6 +49,12 @@ getPossibleValue (Fixed x) = [x]
 getPossibleValue (Possible x) = x
 getPossibleValue (Arrow x) = []
 getPossibleValue (Black) = []
+
+getArrowValue :: Value -> Int
+getArrowValue (Arrow x) = x
+getArrowValue (Fixed _) = 0
+getArrowValue (Possible _) = 0
+getArrowValue (Black) = 0
 
 
 -- Matriz de sudoku 9x9, vai virar makaro 8x8
@@ -191,47 +203,100 @@ transformOnePossibilityLists grid = transformMatrix grid
     -- Same numbers must not be orthogonally adjacent.
     -- An arrow in a black cell points to the orthogonally adjacent cell with the absolutely highest number.
 
-genericVerificationCell :: Cell -> [Int]
-genericVerificationCell (a, b, c, d) | (isFixed d) = (getFixedValue d):[]
-                                     | otherwise = []
+    -- Arrow: 1 - direita, 2 - baixo, 3 - esquerda, 4 - cima
+    -- quando (b+1) -> para direita -> flecha estaria apontando para a esquerda -> 3
+    -- quando (b-1) -> para esquerda -> flecha estaria apontando para a direita -> 1
+    -- quando (a+1) -> para baixo -> flecha estaria apontando para cima -> 4
+    -- quando (a-1) -> para cima -> flecha estaria apontando para baixo -> 2 
 
-genericVerificationLine :: Row -> Int -> [Int]
-genericVerificationLine (x:xs) 1 = genericVerificationCell x
-genericVerificationLine (x:xs) b = genericVerificationLine xs (b-1)
+arrowVerificationCell :: Cell -> [Int]
+arrowVerificationCell (a, b, c, d) | (isFixed d) = (getFixedValue d):[]
+                                   | otherwise = []
 
-genericVerificationColumn :: Grid -> Int -> Int -> [Int]
-genericVerificationColumn (x:xs) 1 b = genericVerificationLine x b
-genericVerificationColumn (x:xs) a b = genericVerificationColumn xs (a-1) b
+arrowVerificationFunction :: Grid -> Int -> Int -> [Int]
+arrowVerificationFunction grid a b = (arrowVerificationCell (percorrer (percorrer grid (a-1)) (b-1)))
 
-genericVerification :: Grid -> Int -> Int -> [Int]
-genericVerification grid a b = genericVerificationColumn grid a b 
+verificarAdjacentsOfArrow :: Cell -> Grid -> [Int]
+verificarAdjacentsOfArrow (a, b, c, d) grid = if a <= 1 then
+                                        (if b <= 1 then
+                                            (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid (a+1) b)
+                                         else
+                                            (if b >= colunas then
+                                                (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid (a+1) b)
+                                             else
+                                                (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid (a+1) b) 
+                                                )
+                                            )
+                                     else
+                                        (if a >= colunas then
+                                            (if b <= 1 then
+                                                (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid (a-1) b)
+                                            else
+                                                (if b >= colunas then
+                                                    (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid (a-1) b)
+                                                else
+                                                    (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid (a-1) b)
+                                                    )
+                                            )
+                                        else
+                                            (if b <= 1 then
+                                                (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid (a-1) b) ++ (arrowVerificationFunction grid (a+1) b)
+                                            else
+                                                (if b >= colunas then
+                                                    (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid (a-1) b) ++ (arrowVerificationFunction grid (a+1) b)
+                                                else
+                                                    (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid (a-1) b) ++ (arrowVerificationFunction grid (a+1) b)
+                                                    )
+                                            )
+                                        )
+
+getArrowDirection :: Cell -> Int -> Grid -> [Int]
+getArrowDirection (a, b, c, d) direcao grid | ((getArrowValue d) == direcao) = verificarAdjacentsOfArrow (a,b,c,d) grid
+                                            | otherwise = []
+
+genericVerificationCell :: Cell -> Int -> Grid -> [Int]
+genericVerificationCell (a, b, c, d) direcao grid | (isFixed d) = (getFixedValue d):[]
+                                                  | (isArrow d) = getArrowDirection (a,b,c,d) direcao grid
+                                                  | otherwise = []
+
+genericVerificationLine :: Row -> Int -> Int -> Grid -> [Int]
+genericVerificationLine (x:xs) 1 direcao grid = genericVerificationCell x direcao grid
+genericVerificationLine (x:xs) b direcao grid = genericVerificationLine xs (b-1) direcao grid
+
+genericVerificationColumn :: Grid -> Int -> Int -> Int -> Grid -> [Int]
+genericVerificationColumn (x:xs) 1 b direcao grid = genericVerificationLine x b direcao grid
+genericVerificationColumn (x:xs) a b direcao grid = genericVerificationColumn xs (a-1) b direcao grid
+
+-- recebe a direção que a flecha teria que ter para que a celula adjacente aponte para a célula original verificada
+genericVerification :: Grid -> Int -> Int -> Int -> [Int]
+genericVerification grid a b direcao = genericVerificationColumn grid a b direcao grid
 
 verifyLeftTopCornerCell :: Int -> Int -> Grid -> [Int]
-verifyLeftTopCornerCell a b grid = (genericVerification grid a (b+1)) ++ (genericVerification grid (a+1) b)
+verifyLeftTopCornerCell a b grid = (genericVerification grid a (b+1) 3) ++ (genericVerification grid (a+1) b 4)
 
 verifyRightTopCornerCell :: Int -> Int -> Grid -> [Int]
-verifyRightTopCornerCell a b grid = (genericVerification grid a (b-1)) ++ (genericVerification grid (a+1) b)
+verifyRightTopCornerCell a b grid = (genericVerification grid a (b-1) 1) ++ (genericVerification grid (a+1) b 4)
 
 verifyRightBottomCornerCell :: Int -> Int -> Grid -> [Int]
-verifyRightBottomCornerCell a b grid = (genericVerification grid a (b-1)) ++ (genericVerification grid (a-1) b)
+verifyRightBottomCornerCell a b grid = (genericVerification grid a (b-1) 1) ++ (genericVerification grid (a-1) b 2)
 
 verifyLeftBottomCornerCell :: Int -> Int -> Grid -> [Int]
-verifyLeftBottomCornerCell a b grid = (genericVerification grid a (b+1)) ++ (genericVerification grid (a-1) b)
+verifyLeftBottomCornerCell a b grid = (genericVerification grid a (b+1) 3) ++ (genericVerification grid (a-1) b 2)
 
 verifyBottomLineCell :: Int -> Int -> Grid -> [Int]
-verifyBottomLineCell a b grid = (genericVerification grid a (b+1)) ++ (genericVerification grid a (b+1)) ++ (genericVerification grid (a-1) b)
+verifyBottomLineCell a b grid = (genericVerification grid a (b+1) 3) ++ (genericVerification grid a (b+1) 3) ++ (genericVerification grid (a-1) b 2)
 
 verifyTopLineCell :: Int -> Int -> Grid -> [Int]
-verifyTopLineCell a b grid = (genericVerification grid a (b+1)) ++ (genericVerification grid a (b+1)) ++ (genericVerification grid (a+1) b)
+verifyTopLineCell a b grid = (genericVerification grid a (b-1) 1) ++ (genericVerification grid a (b+1) 3) ++ (genericVerification grid (a+1) b 4)
 
 verifyLeftLineCell :: Int -> Int -> Grid -> [Int]
-verifyLeftLineCell a b grid = (genericVerification grid (a-1) b) ++ (genericVerification grid (a+1) b) ++ (genericVerification grid a (b+1))
+verifyLeftLineCell a b grid = (genericVerification grid (a-1) b 2) ++ (genericVerification grid (a+1) b 4) ++ (genericVerification grid a (b+1) 3)
 
 verifyRightLineCell :: Int -> Int -> Grid -> [Int]
-verifyRightLineCell a b grid = (genericVerification grid (a-1) b) ++ (genericVerification grid (a+1) b) ++ (genericVerification grid a (b-1))
+verifyRightLineCell a b grid = (genericVerification grid (a-1) b 2) ++ (genericVerification grid (a+1) b 4) ++ (genericVerification grid a (b-1) 1)
 
 verifyMidCell :: Int -> Int -> Grid -> [Int]
-verifyMidCell a b grid = (genericVerification grid (a-1) b) ++ (genericVerification grid (a+1) b) ++ (genericVerification grid a (b+1)) ++ (genericVerification grid a (b-1))
+verifyMidCell a b grid = (genericVerification grid (a-1) b 2) ++ (genericVerification grid (a+1) b 4) ++ (genericVerification grid a (b+1) 3) ++ (genericVerification grid a (b-1) 1)
 
 getAdjacentValues :: Cell -> Grid -> [Int]
 getAdjacentValues (a, b, c, d) grid = if a <= 1 then
@@ -281,6 +346,7 @@ verifyMatrix (x:xs) grid = ((verifyLine x grid):[]) ++ (verifyMatrix xs grid)
 
 verifyOrthogonallyAdjacency :: Grid -> Grid
 verifyOrthogonallyAdjacency grid = verifyMatrix grid grid
+
 
 
 --- Parte do Backtracking
@@ -366,10 +432,8 @@ main = do
     let quantityOfRegions = amountOfRegions makaro
 
     let makaro_pruned = pruningCellPossibilities makaro quantityOfRegions
-    print(makaro_pruned)
 
     let makaro_pruned2 = transformOnePossibilityLists makaro_pruned
-    print(makaro_pruned2)
 
     let makaro_pruned3 = verifyOrthogonallyAdjacency makaro_pruned2
     print(makaro_pruned3)
