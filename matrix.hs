@@ -210,7 +210,7 @@ transformOnePossibilityLists grid = transformMatrix grid
     -- quando (a-1) -> para cima -> flecha estaria apontando para baixo -> 2 
 
 arrowVerificationCell :: Cell -> [Int]
-arrowVerificationCell (a, b, c, d) | (isFixed d) = (getFixedValue d):[]
+arrowVerificationCell (a, b, c, d) | (isFixed d) = [1..(getFixedValue d)]
                                    | otherwise = []
 
 arrowVerificationFunction :: Grid -> Int -> Int -> [Int]
@@ -400,7 +400,8 @@ choiceNumber (a:b) descarta
 --             then backtracking grid cell n (descarta+n )
 --             else newBoard
         
-
+tiraPossibilidades:: Grid -> Int -> Grid
+tiraPossibilidades grid quantidadeRegioes = transformOnePossibilityLists (verifyOrthogonallyAdjacency (transformOnePossibilityLists (pruningCellPossibilities grid quantidadeRegioes)))
 
 main = do
     {-let linha_1 = percorrer sudoku 0
@@ -431,12 +432,16 @@ main = do
 
     let quantityOfRegions = amountOfRegions makaro
 
-    let makaro_pruned = pruningCellPossibilities makaro quantityOfRegions
+    let makaro_pruned = tiraPossibilidades makaro quantityOfRegions
 
-    let makaro_pruned2 = transformOnePossibilityLists makaro_pruned
+    let makaro_pruned1 = tiraPossibilidades makaro_pruned quantityOfRegions
 
-    let makaro_pruned3 = verifyOrthogonallyAdjacency makaro_pruned2
+    let makaro_pruned2 = tiraPossibilidades makaro_pruned1 quantityOfRegions
 
-    let makaro_pruned4 = transformOnePossibilityLists makaro_pruned3
+    let makaro_pruned3 = tiraPossibilidades makaro_pruned2 quantityOfRegions
 
-    print(makaro_pruned4)
+    let makaro_pruned4 = tiraPossibilidades makaro_pruned3 quantityOfRegions
+
+    let makaro_pruned5 = tiraPossibilidades makaro_pruned4 quantityOfRegions
+
+    print(makaro_pruned3)
