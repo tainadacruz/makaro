@@ -431,12 +431,12 @@ main = do
 
     let quantityOfRegions = amountOfRegions makaro
 
-    let teste = getFixedValuesOfMatrix makaro 4
-    print(teste)
-
     let makaro_pruned = pruningCellPossibilities makaro quantityOfRegions
 
     let makaro_pruned2 = transformOnePossibilityLists makaro_pruned
 
     let makaro_pruned3 = verifyOrthogonallyAdjacency makaro_pruned2
-    print(makaro_pruned3)
+
+    let makaro_pruned4 = transformOnePossibilityLists makaro_pruned3
+
+    print(makaro_pruned4)
