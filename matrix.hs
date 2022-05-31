@@ -283,7 +283,57 @@ verifyOrthogonallyAdjacency :: Grid -> Grid
 verifyOrthogonallyAdjacency grid = verifyMatrix grid grid
 
 
+--- Parte do Backtracking
 
+--Itera pela Grid em busca de uma celula com 2 possibilidades
+choiceRow:: Grid -> Row
+choiceRow (a:b) = a
+
+choiceCell:: Row -> Cell
+choiceCell (a:b) = a
+
+-- pega quantidade de membros de um Value, só serviria para otimizar
+-- algoritmo de pegar celulas
+getSize:: Value -> Int
+getSize a = length (getPossibleValue a)
+
+getCellWithPossibility_fromRow:: Int-> Maybe Cell
+getCellWithPossibility_fromRow a = Nothing 
+
+
+--getCellWithPossibility_fromGrid:: Grid -> Cell 
+--getCellWithPossibility_fromGrid (a:b) = cell
+--    let cell = getCellWithPossibility_fromRow a
+--    in if (x == Nothing)
+--        then getCellWithPossibility_fromGrid b 
+--        else cell
+    
+
+    
+
+-- is_member(n,array) = if n in array 
+isMember:: Int -> [Int] -> Bool
+isMember n [] = False
+isMember n (x:xs)
+    | n == x = True
+    | otherwise = isMember n xs
+
+-- Pega o primeiro numero que não estiver no array
+choiceNumber:: [Int] -> [Int] -> Int 
+choiceNumber (a:b) descarta
+    | isMember a descarta = choiceNumber b descarta
+    | otherwise = a
+
+
+--backTracking:: Grid -> Cell -> Int -> [Int] -> Grid
+--backTracking grid cell n descarta
+--    = let newBoard = TiraPossibilidas (putNumber Cell N grid) 
+--     in if(possible newBoard)
+--         then backtracking newGrid (choiceCell newGrid) (choiceNumber Cell) [] 
+--         else if (notPossible newBoard)
+--             then backtracking grid cell n (descarta+n )
+--             else newBoard
+        
 
 
 main = do
