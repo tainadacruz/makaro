@@ -34,6 +34,9 @@ isFixed (Black) = False
 
 getFixedValue :: Value -> Int
 getFixedValue (Fixed x) = x
+getFixedValue (Possible _) = 0
+getFixedValue (Arrow _) = 0
+getFixedValue (Black) = 0
 
 getPossibleValue :: Value -> [Int]
 getPossibleValue (Fixed x) = [x]
@@ -184,76 +187,95 @@ transformOnePossibilityLists grid = transformMatrix grid
 
 
 
--- Bloco para checar as possibilidades de acordo com as regras (por exemplo, não pode haver números adjacentes)
+-- Bloco para checar as possibilidades de acordo com as regras:
+    -- Same numbers must not be orthogonally adjacent.
+    -- An arrow in a black cell points to the orthogonally adjacent cell with the absolutely highest number.
 
-genericVerificationLine :: Int -> Int -> Grid -> [Int]
-genericVerificationLine y x = 
+genericVerificationCell :: Cell -> [Int]
+genericVerificationCell (a, b, c, d) | (isFixed d) = (getFixedValue d):[]
+                                     | otherwise = []
 
-genericVerificationColumn :: Int -> Int -> Grid -> [Int]
-genericVerificationColumn y x = 
+genericVerificationLine :: Row -> Int -> [Int]
+genericVerificationLine (x:xs) 1 = genericVerificationCell x
+genericVerificationLine (x:xs) b = genericVerificationLine xs (b-1)
 
-genericVerification :: Int -> Int -> Grid -> [Int]
-genericVerification y x = 
+genericVerificationColumn :: Grid -> Int -> Int -> [Int]
+genericVerificationColumn (x:xs) 1 b = genericVerificationLine x b
+genericVerificationColumn (x:xs) a b = genericVerificationColumn xs (a-1) b
+
+genericVerification :: Grid -> Int -> Int -> [Int]
+genericVerification grid a b = genericVerificationColumn grid a b 
 
 verifyLeftTopCornerCell :: Int -> Int -> Grid -> [Int]
-verifyLeftTopCornerCell
+verifyLeftTopCornerCell a b grid = (genericVerification grid a (b+1)) ++ (genericVerification grid (a+1) b)
 
 verifyRightTopCornerCell :: Int -> Int -> Grid -> [Int]
+verifyRightTopCornerCell a b grid = (genericVerification grid a (b-1)) ++ (genericVerification grid (a+1) b)
 
 verifyRightBottomCornerCell :: Int -> Int -> Grid -> [Int]
+verifyRightBottomCornerCell a b grid = (genericVerification grid a (b-1)) ++ (genericVerification grid (a-1) b)
 
 verifyLeftBottomCornerCell :: Int -> Int -> Grid -> [Int]
+verifyLeftBottomCornerCell a b grid = (genericVerification grid a (b+1)) ++ (genericVerification grid (a-1) b)
 
 verifyBottomLineCell :: Int -> Int -> Grid -> [Int]
+verifyBottomLineCell a b grid = (genericVerification grid a (b+1)) ++ (genericVerification grid a (b+1)) ++ (genericVerification grid (a-1) b)
 
 verifyTopLineCell :: Int -> Int -> Grid -> [Int]
+verifyTopLineCell a b grid = (genericVerification grid a (b+1)) ++ (genericVerification grid a (b+1)) ++ (genericVerification grid (a+1) b)
 
 verifyLeftLineCell :: Int -> Int -> Grid -> [Int]
+verifyLeftLineCell a b grid = (genericVerification grid (a-1) b) ++ (genericVerification grid (a+1) b) ++ (genericVerification grid a (b+1))
 
 verifyRightLineCell :: Int -> Int -> Grid -> [Int]
+verifyRightLineCell a b grid = (genericVerification grid (a-1) b) ++ (genericVerification grid (a+1) b) ++ (genericVerification grid a (b-1))
 
 verifyMidCell :: Int -> Int -> Grid -> [Int]
+verifyMidCell a b grid = (genericVerification grid (a-1) b) ++ (genericVerification grid (a+1) b) ++ (genericVerification grid a (b+1)) ++ (genericVerification grid a (b-1))
+
+getAdjacentValues :: Cell -> Grid -> [Int]
+getAdjacentValues (a, b, c, d) grid = if a <= 1 then
+                                        (if b <= 1 then
+                                            verifyLeftTopCornerCell a b grid
+                                         else
+                                            (if b >= colunas then
+                                                verifyRightTopCornerCell a b grid
+                                             else
+                                                verifyTopLineCell a b grid
+                                                )
+                                            )
+                                     else
+                                        (if a >= colunas then
+                                            (if b <= 1 then
+                                                verifyLeftBottomCornerCell a b grid
+                                            else
+                                                (if b >= colunas then
+                                                    verifyRightBottomCornerCell a b grid
+                                                else
+                                                    verifyBottomLineCell a b grid
+                                                    )
+                                            )
+                                        else
+                                            (if b <= 1 then
+                                                verifyLeftLineCell a b grid
+                                            else
+                                                (if b >= colunas then
+                                                    verifyRightLineCell a b grid
+                                                else
+                                                    verifyMidCell a b grid
+                                                    )
+                                            )
+                                        )
 
 verifyCell :: Cell -> Grid -> Cell
-verifyCell (a, b, c, d) grid = if a <= 1 then
-                                    (if b == 1 then
+verifyCell (a, b, c, d) grid | (isPossible d) = (a, b, c, Possible (filtrar ehIgual (getPossibleValue d) (getAdjacentValues (a, b, c, d) grid))) 
+                             | otherwise = (a, b, c, d)
 
-                                     else
-                                        (if b == 8 then
-
-                                         else
-                                            )
-                                     
-                                        )
-                                 else
-                                    (if a == 8 then
-                                        (if b == 1 then
-
-                                        else
-                                            (if b == 8 then
-
-                                            else
-                                                )
-                                     
-                                        )
-                                    else
-                                        (if b == 1 then
-
-                                        else
-                                            (if b == 8 then
-
-                                            else
-                                                )
-                                     
-                                        )
-                                    ) 
-
-
-verifyLine :: Row -> Int -> Grid -> Row
+verifyLine :: Row -> Grid -> Row
 verifyLine (x:[]) grid = (verifyCell x grid):[]
 verifyLine (x:xs) grid = ((verifyCell x grid):[]) ++ (verifyLine xs grid)
 
-verifyMatrix :: Grid -> Int -> Grid -> Grid
+verifyMatrix :: Grid -> Grid -> Grid
 verifyMatrix (x:[]) grid = (verifyLine x grid):[]
 verifyMatrix (x:xs) grid = ((verifyLine x grid):[]) ++ (verifyMatrix xs grid)
 
@@ -298,3 +320,6 @@ main = do
 
     let makaro_pruned2 = transformOnePossibilityLists makaro_pruned
     print(makaro_pruned2)
+
+    let makaro_pruned3 = verifyOrthogonallyAdjacency makaro_pruned2
+    print(makaro_pruned3)
