@@ -360,50 +360,31 @@ verifyMatrix (x:xs) grid = ((verifyLine x grid):[]) ++ (verifyMatrix xs grid)
 verifyOrthogonallyAdjacency :: Grid -> Grid
 verifyOrthogonallyAdjacency grid = verifyMatrix grid grid
 
-
-
 --- Parte do Backtracking
-
---Itera pela Grid em busca de uma celula com 2 possibilidades
-choiceRow:: Grid -> Row
-choiceRow (a:b) = a
-
-choiceCell:: Row -> Cell
-choiceCell (a:b) = a
 
 -- pega quantidade de membros de um Value, só serviria para otimizar
 -- algoritmo de pegar celulas
 getSize:: Cell -> Int
 getSize (a,b,c,d) = length (getPossibleValue d)
 
-
--- adaptar pra > n ao inves de == n se for fazer a resolução utilizando o while
-getCellWithPossibility_fromRow:: Row -> Int -> Maybe Cell
-getCellWithPossibility_fromRow [] n = Nothing
-getCellWithPossibility_fromRow (x:xs) n 
+-- Retorna Celula com Value de tamanho N de uma linha 
+-- Se não encontrar retorna Nothing
+getCellWithPossibility_N_fromRow:: Row -> Int -> Maybe Cell
+getCellWithPossibility_N_fromRow [] n = Nothing
+getCellWithPossibility_N_fromRow (x:xs) n 
     |(getSize x) == n = (Just x)
-    |otherwise = getCellWithPossibility_fromRow xs n
-        
-getCellWithPossibility_fromGrid:: Grid -> Int -> Maybe Cell 
-getCellWithPossibility_fromGrid [] n = Nothing
-getCellWithPossibility_fromGrid (a:b) n = let
-    cell = getCellWithPossibility_fromRow a n 
+    |otherwise = getCellWithPossibility_N_fromRow xs n
+    
+-- Retorna Celula com Value de tamanho N da grid    
+-- Se não encontrar retorna Nothing
+getCellWithPossibility_N_fromGrid:: Grid -> Int -> Maybe Cell 
+getCellWithPossibility_N_fromGrid [] n = Nothing
+getCellWithPossibility_N_fromGrid (a:b) n = let
+    cell = getCellWithPossibility_N_fromRow a n 
     in if (cell == Nothing)
-        then getCellWithPossibility_fromGrid b n
+        then getCellWithPossibility_N_fromGrid b n
         else cell
     
--- botar quantidade da maior região ao invés de 10
--- ou maior possibilidades
-getBestCell::Grid -> Int -> Maybe Cell
-getBestCell a 10 = Nothing
-getBestCell a n = let 
-    resp = getCellWithPossibility_fromGrid a n 
-    in if (resp == Nothing)
-        then getCellWithPossibility_fromGrid a (n+1)
-        else resp
-    
-
-
 -- is_member(n,array) = if n in array 
 isMember:: Int -> [Int] -> Bool
 isMember n [] = False
@@ -417,30 +398,46 @@ choiceNumber (a:b) descarta
     | isMember a descarta = choiceNumber b descarta
     | otherwise = a
 
+-- Pega a melhor Celula para chutar 
+getBestCell::Grid -> Int -> Maybe Cell
+getBestCell a 10 = Nothing
+getBestCell a n = let 
+    resp = getCellWithPossibility_N_fromGrid a n 
+    in if (resp == Nothing)
+        then getCellWithPossibility_N_fromGrid a (n+1)
+        else resp
+        
+-- Função para Retornar uma grid com a celula dada modificada 
 putNumber:: Grid -> Cell -> Int -> Grid
 putNumber grid cell n = grid
 
--- verifica desde o 2
-hasPossible:: Grid -> Bool 
-hasPossible grid 
-    | (getBestCell grid 2 )== Nothing = False
+-- Vai retornar True se tiver uma Celula com tamanho 0 da lista de possibilidades
+hasImpossible:: Grid -> Bool
+hasImpossible grid 
+    | (getCellWithPossibility_N_fromGrid grid 0) == Nothing = False
     | otherwise = True
 
-hasImpossible:: Grid -> Bool
-hasImpossible grad = True 
+-- verifica se possui celula com tamanho maior que 2 da lista de possibilidades
+hasPossibleOnRow:: Row -> Bool
+hasPossibleOnRow []  = False
+hasPossibleOnRow (x:xs)  
+    |(getSize x) > 1 = True
+    |otherwise = hasPossibleOnRow xs 
+    
+-- verifica se possui celula com tamanho maior que 2 da lista de possibilidades
+hasPossible :: Grid -> Bool
+hasPossible [] = False
+hasPossible (a:b) = let
+    hasCell = hasPossibleOnRow a 
+    in if (hasCell == False)
+        then hasPossible b 
+        else hasCell
 
--- backTracking:: Grid -> Cell -> Int -> [Int] -> Grid
--- backTracking grid cell n descarta = let
---       newGrid = tiraPossibilidades (putNumber grid cell n) (amountOfRegions makaro) 
---       in if(hasPossible newgrid) -- hasPossible newBoard
---             then backTracking newGrid ((Just (getBestCell newGrid 2)) (choiceNumber (getBestCell newGrid 2)) ([]) 
---             else if (hasImpossible newgrid) -- hasImpossible newBoard
---                 then backTracking grid cell n (descarta+n )
---                 else newBoard
-
+-- Vai resolvendo o puzzle 
 tiraPossibilidades:: Grid -> Int -> Grid
 tiraPossibilidades grid quantidadeRegioes = transformOnePossibilityLists (verifyOrthogonallyAdjacency (transformOnePossibilityLists (pruningCellPossibilities grid quantidadeRegioes)))
         
+-- Roda enquanto tiver possibilidades
 while::Grid -> Grid
 while grid  = let
     newGrid = tiraPossibilidades grid (amountOfRegions makaro)
@@ -448,6 +445,8 @@ while grid  = let
         then while newGrid 
         else newGrid 
 
+-- Converte Matriz em formato String
+-- Usa o (getFixedValue que a gente criou)
 valueToChar:: Value -> String
 valueToChar x = show (getFixedValue( x) )
 
@@ -459,6 +458,7 @@ gridToString::Grid -> String
 gridToString [] = "\n"
 gridToString [a] = (rowToString a) ++ (gridToString [])
 gridToString (a:b) = (rowToString a) ++ (gridToString b)
+
 
 main = do
     {-let linha_1 = percorrer sudoku 0
