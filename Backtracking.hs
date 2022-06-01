@@ -87,3 +87,13 @@ module Backtracking where
         in if (hasPossible grid)
             then while newGrid 
             else newGrid 
+
+    -- backTracking:: Grid -> Cell -> Int -> [Int] -> Grid
+    -- backTracking grid cell n descarta = let
+    --       newGrid = tiraPossibilidades (putNumber grid cell n) (amountOfRegions makaro) 
+    --       in if (hasPossible newgrid) -- hasPossible newBoard
+    --             then backTracking newGrid (Just (getBestCell newGrid 2)) (choiceNumber (getBestCell newGrid 2)) ([]) 
+    --             else 
+    --                 (if (hasImpossible newgrid) -- hasImpossible newBoard
+    --                 then backTracking grid cell (choiceNumber (getBestCell newGrid 2)) (descarta+n )
+    --                 else newGrid)
