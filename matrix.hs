@@ -373,23 +373,36 @@ choiceCell (a:b) = a
 
 -- pega quantidade de membros de um Value, só serviria para otimizar
 -- algoritmo de pegar celulas
-getSize:: Value -> Int
-getSize a = length (getPossibleValue a)
-
-getCellWithPossibility_fromRow:: Int-> Maybe Cell
-getCellWithPossibility_fromRow a = Nothing 
+getSize:: Cell -> Int
+getSize (a,b,c,d) = length (getPossibleValue d)
 
 
---getCellWithPossibility_fromGrid:: Grid -> Cell 
---getCellWithPossibility_fromGrid (a:b) = cell
---    let cell = getCellWithPossibility_fromRow a
---    in if (x == Nothing)
---        then getCellWithPossibility_fromGrid b 
---        else cell
+-- adaptar pra > n ao inves de == n se for fazer a resolução utilizando o while
+getCellWithPossibility_fromRow:: Row -> Int -> Maybe Cell
+getCellWithPossibility_fromRow [] n = Nothing
+getCellWithPossibility_fromRow (x:xs) n 
+    |(getSize x) == n = (Just x)
+    |otherwise = getCellWithPossibility_fromRow xs n
+        
+getCellWithPossibility_fromGrid:: Grid -> Int -> Maybe Cell 
+getCellWithPossibility_fromGrid [] n = Nothing
+getCellWithPossibility_fromGrid (a:b) n = let
+    cell = getCellWithPossibility_fromRow a n 
+    in if (cell == Nothing)
+        then getCellWithPossibility_fromGrid b n
+        else cell
     
-
+-- botar quantidade da maior região ao invés de 10
+-- ou maior possibilidades
+getBestCell::Grid -> Int -> Maybe Cell
+getBestCell a 10 = Nothing
+getBestCell a n = let 
+    resp = getCellWithPossibility_fromGrid a n 
+    in if (resp == Nothing)
+        then getCellWithPossibility_fromGrid a (n+1)
+        else resp
     
-
+   
 -- is_member(n,array) = if n in array 
 isMember:: Int -> [Int] -> Bool
 isMember n [] = False
@@ -403,16 +416,34 @@ choiceNumber (a:b) descarta
     | isMember a descarta = choiceNumber b descarta
     | otherwise = a
 
+putNumber:: Grid -> Cell -> Int -> Grid
+putNumber grid cell n = grid
 
---backTracking:: Grid -> Cell -> Int -> [Int] -> Grid
---backTracking grid cell n descarta
---    = let newBoard = TiraPossibilidas (putNumber Cell N grid) 
---     in if(possible newBoard)
---         then backtracking newGrid (choiceCell newGrid) (choiceNumber Cell) [] 
---         else if (notPossible newBoard)
---             then backtracking grid cell n (descarta+n )
---             else newBoard
+-- verifica desde o 2
+hasPossible:: Grid -> Bool 
+hasPossible grid 
+    | getBestCell grid 2 == Nothing = False
+    | otherwise = True
+
+hasImpossible:: Grid -> Bool
+hasImpossible grad = True 
+
+-- backTracking:: Grid -> Cell -> Int -> [Int] -> Grid
+-- backTracking grid cell n descarta = let
+--       newGrid = tiraPossibilidades (putNumber grid cell n) (amountOfRegions makaro) 
+--       in if(hasPossible newgrid) -- hasPossible newBoard
+--             then backTracking newGrid ((Just (getBestCell newGrid 2)) (choiceNumber (getBestCell newGrid 2)) ([]) 
+--             else if (hasImpossible newgrid) -- hasImpossible newBoard
+--                 then backTracking grid cell n (descarta+n )
+--                 else newBoard
         
+while::Grid -> Grid
+while grid  = let
+    newGrid = tiraPossibilidades grid (amountOfRegions makaro)
+    in if (hasPossible grid)
+        then tiraPossibilidades newGrid (amountOfRegions makaro)
+        else newGrid 
+
 tiraPossibilidades:: Grid -> Int -> Grid
 tiraPossibilidades grid quantidadeRegioes = transformOnePossibilityLists (verifyOrthogonallyAdjacency (transformOnePossibilityLists (pruningCellPossibilities grid quantidadeRegioes)))
 
