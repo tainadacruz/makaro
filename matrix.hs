@@ -402,7 +402,8 @@ getBestCell a n = let
         then getCellWithPossibility_fromGrid a (n+1)
         else resp
     
-   
+
+
 -- is_member(n,array) = if n in array 
 isMember:: Int -> [Int] -> Bool
 isMember n [] = False
@@ -422,7 +423,7 @@ putNumber grid cell n = grid
 -- verifica desde o 2
 hasPossible:: Grid -> Bool 
 hasPossible grid 
-    | getBestCell grid 2 == Nothing = False
+    | (getBestCell grid 2 )== Nothing = False
     | otherwise = True
 
 hasImpossible:: Grid -> Bool
@@ -436,16 +437,28 @@ hasImpossible grad = True
 --             else if (hasImpossible newgrid) -- hasImpossible newBoard
 --                 then backTracking grid cell n (descarta+n )
 --                 else newBoard
+
+tiraPossibilidades:: Grid -> Int -> Grid
+tiraPossibilidades grid quantidadeRegioes = transformOnePossibilityLists (verifyOrthogonallyAdjacency (transformOnePossibilityLists (pruningCellPossibilities grid quantidadeRegioes)))
         
 while::Grid -> Grid
 while grid  = let
     newGrid = tiraPossibilidades grid (amountOfRegions makaro)
     in if (hasPossible grid)
-        then tiraPossibilidades newGrid (amountOfRegions makaro)
+        then while newGrid 
         else newGrid 
 
-tiraPossibilidades:: Grid -> Int -> Grid
-tiraPossibilidades grid quantidadeRegioes = transformOnePossibilityLists (verifyOrthogonallyAdjacency (transformOnePossibilityLists (pruningCellPossibilities grid quantidadeRegioes)))
+valueToChar:: Value -> String
+valueToChar x = show (getFixedValue( x) )
+
+rowToString:: Row -> String 
+rowToString [] = "\n"
+rowToString ((a,b,c,d):xs) = "["++(valueToChar d)++"]" ++ rowToString xs
+
+gridToString::Grid -> String
+gridToString [] = "\n"
+gridToString [a] = (rowToString a) ++ (gridToString [])
+gridToString (a:b) = (rowToString a) ++ (gridToString b)
 
 main = do
     {-let linha_1 = percorrer sudoku 0
@@ -461,12 +474,10 @@ main = do
     let elemento_1 = percorrer linha_1 0
     let regiao = getValue elemento_1
     print(regiao)
-
     let linha_1 = percorrer sudoku 1
     let elemento_5 = percorrer linha_1 0
     let valor = getValue elemento_5
     print(valor)
-
     let sudoku_pruned = pruningCellPossibilities sudoku (amountOfRegions sudoku)
     let linha = percorrer sudoku_pruned 1
     let elemento = percorrer linha 0
@@ -474,18 +485,5 @@ main = do
     print(valor_2)
     print(sudoku_pruned) -}
 
-    let quantityOfRegions = amountOfRegions makaro
-
-    let makaro_pruned = tiraPossibilidades makaro quantityOfRegions
-
-    let makaro_pruned1 = tiraPossibilidades makaro_pruned quantityOfRegions
-
-    let makaro_pruned2 = tiraPossibilidades makaro_pruned1 quantityOfRegions
-
-    let makaro_pruned3 = tiraPossibilidades makaro_pruned2 quantityOfRegions
-
-    let makaro_pruned4 = tiraPossibilidades makaro_pruned3 quantityOfRegions
-
-    let makaro_pruned5 = tiraPossibilidades makaro_pruned4 quantityOfRegions
-
-    print(makaro_pruned3)
+    let makaro_pos_while = while makaro 
+    putStrLn (gridToString makaro_pos_while)
