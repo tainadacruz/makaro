@@ -13,9 +13,8 @@ module Main (main) where
         print "while"
         let makaro_pos_while = while makaro 
         putStrLn (gridToString makaro_pos_while)
-        let resp = backtrackingArray [makaro]
-        let rop = backtracking [makaro]
+        let makaro_solved = backtracking [makaro]
         print "backtracking"
-        putStrLn(gridToString rop)
+        putStrLn (gridToString makaro_solved)
 
         

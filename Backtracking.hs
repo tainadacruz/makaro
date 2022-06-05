@@ -11,10 +11,16 @@ module Backtracking where
     desempilha:: [n] -> [n]
     desempilha (a:b) = b 
 
+    -- retorna tamanho de um Value da celula 
+    getValueArraySize :: Value -> Int 
+    getValueArraySize (Possible x) = length x 
+    getValueArraySize (Fixed x) = 1
+    getValueArraySize _ = 1
+
     -- pega quantidade de membros de um Value, só serviria para otimizar
     -- algoritmo de pegar celulas
     getSize:: Cell -> Int
-    getSize (a,b,c,d) = length (getPossibleValue d)
+    getSize (a,b,c,d) = getValueArraySize d 
 
     -- Retorna Celula com Value de tamanho N de uma linha 
     -- Se não encontrar retorna Nothing
@@ -93,8 +99,8 @@ module Backtracking where
     -- Vai retornar True se tiver uma Celula com tamanho 0 da lista de possibilidades
     hasImpossible:: Grid -> Bool
     hasImpossible grid 
-        | (getCellWithPossibility_N_fromGrid grid 0) == Nothing = True
-        | otherwise = False
+        | (getCellWithPossibility_N_fromGrid grid 0) == Nothing = False
+        | otherwise = True
 
     -- verifica se possui celula com tamanho maior que 2 da lista de possibilidades
     hasPossibleOnRow:: Row -> Bool
@@ -133,17 +139,6 @@ module Backtracking where
     backtracking:: [Grid] -> Grid
     backtracking [] = []
     backtracking (a:b)
-        | hasPossible (while a ) = backtracking ((generateGrids (while a)(mayToCell (getBestCell (while a )  2))) ++ b)
         | hasImpossible (while a)= backtracking b 
+        | hasPossible (while a ) = backtracking ((generateGrids (while a)(mayToCell (getBestCell (while a )  2))) ++ b)
         | otherwise = (while a)
-
-    
-    -- backtracking que retorna o array produzido
-    backtrackingArray:: [Grid] -> [Grid]
-    backtrackingArray [] = []
-    backtrackingArray (a:b)
-        | hasPossible (while a ) = (backtrackingArray ((generateGrids (while a)(mayToCell (getBestCell (while a )  2)))) ++ b)
-        | hasImpossible (while a)= backtrackingArray b 
-        | otherwise = [a] ++ b
-
-
