@@ -59,6 +59,7 @@ module Backtracking where
     
 
     valueHead:: Value -> Value  
+    valueHead (Possible []) = Possible []
     valueHead (Possible a) = Fixed (a !! 0 )
 
     valueTail::Value -> Value 
@@ -116,7 +117,7 @@ module Backtracking where
     while::Grid -> Grid
     while grid  = let
         newGrid = tiraPossibilidades grid (amountOfRegions makaro)
-        in if (hasPossible grid)
+        in if (hasPossible newGrid && not (newGrid == grid) )
             then while newGrid 
             else newGrid 
 

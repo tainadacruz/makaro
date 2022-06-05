@@ -81,10 +81,12 @@ module Verification where
                                                     | otherwise = []
 
     genericVerificationLine :: Row -> Int -> Int -> Grid -> [Int]
+    genericVerificationLine [] b direcao grid = []
     genericVerificationLine (x:xs) 1 direcao grid = genericVerificationCell x direcao grid
     genericVerificationLine (x:xs) b direcao grid = genericVerificationLine xs (b-1) direcao grid
 
     genericVerificationColumn :: Grid -> Int -> Int -> Int -> Grid -> [Int]
+    genericVerificationColumn [] a b direcao grid = []
     genericVerificationColumn (x:xs) 1 b direcao grid = genericVerificationLine x b direcao grid
     genericVerificationColumn (x:xs) a b direcao grid = genericVerificationColumn xs (a-1) b direcao grid
 
