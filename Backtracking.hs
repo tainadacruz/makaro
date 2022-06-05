@@ -5,6 +5,12 @@ module Backtracking where
     import Transform
     import Verification
 
+    empilha:: n -> [n] -> [n]
+    empilha var pilha = [var] ++ pilha
+
+    desempilha:: [n] -> [n]
+    desempilha (a:b) = b 
+
     -- pega quantidade de membros de um Value, só serviria para otimizar
     -- algoritmo de pegar celulas
     getSize:: Cell -> Int
@@ -49,16 +55,42 @@ module Backtracking where
         in if (resp == Nothing)
             then getCellWithPossibility_N_fromGrid a (n+1)
             else resp
+
+    
+
+    valueHead:: Value -> Value  
+    valueHead (Possible a) = Fixed (a !! 0 )
+
+    valueTail::Value -> Value 
+    valueTail a = Possible( tail (getPossibleValue a))
+
+    generateGrids:: Grid -> Cell -> [Grid]
+    generateGrids grid (a,b,c,d) 
+        | getFixedValue d > 0 =  [putCellOnGrid grid (a,b,c,d)]
+        | otherwise = [putCellOnGrid grid (a,b,c, valueHead d)] ++ generateGrids grid (a,b,c,valueTail d)
             
-    -- Função para Retornar uma grid com a celula dada modificada 
-    putNumber:: Grid -> Cell -> Int -> Grid
-    putNumber grid cell n = grid
+
+    isSamePosition:: Cell -> Cell -> Bool
+    isSamePosition (a,b,c,d) (aT,bT,cT,dT)
+        | (a == aT) && (b == bT) = True 
+        | otherwise = False
+
+    putNumberOnRow:: Row -> Cell -> Row
+    putNumberOnRow [] cell = []
+    putNumberOnRow (x:xs) cell 
+        | isSamePosition x cell = [cell] ++ putNumberOnRow xs cell
+        | otherwise = [x] ++ putNumberOnRow xs cell
+
+
+    putCellOnGrid:: Grid -> Cell -> Grid
+    putCellOnGrid [] cell = []
+    putCellOnGrid (x:xs) cell = [(putNumberOnRow x cell)] ++ putCellOnGrid xs cell  
 
     -- Vai retornar True se tiver uma Celula com tamanho 0 da lista de possibilidades
     hasImpossible:: Grid -> Bool
     hasImpossible grid 
-        | (getCellWithPossibility_N_fromGrid grid 0) == Nothing = False
-        | otherwise = True
+        | (getCellWithPossibility_N_fromGrid grid 0) == Nothing = True
+        | otherwise = False
 
     -- verifica se possui celula com tamanho maior que 2 da lista de possibilidades
     hasPossibleOnRow:: Row -> Bool
@@ -88,12 +120,15 @@ module Backtracking where
             then while newGrid 
             else newGrid 
 
-    -- backTracking:: Grid -> Cell -> Int -> [Int] -> Grid
-    -- backTracking grid cell n descarta = let
-    --       newGrid = tiraPossibilidades (putNumber grid cell n) (amountOfRegions makaro) 
-    --       in if (hasPossible newgrid) -- hasPossible newBoard
-    --             then backTracking newGrid (Just (getBestCell newGrid 2)) (choiceNumber (getBestCell newGrid 2)) ([]) 
-    --             else 
-    --                 (if (hasImpossible newgrid) -- hasImpossible newBoard
-    --                 then backTracking grid cell (choiceNumber (getBestCell newGrid 2)) (descarta+n )
-    --                 else newGrid)
+    mayToGo:: Maybe Cell -> Cell
+    mayToGo Nothing = (0,0,0,Fixed 0)
+    mayToGo (Just a) = a 
+
+    backtracking:: [Grid] -> Grid
+    backtracking [] = []
+    backtracking (a:b)
+        | hasPossible (while a ) = backtracking ((generateGrids (while a)(mayToGo (getBestCell (while a )  2))) ++ b)
+        | hasImpossible (while a)= backtracking b 
+        | otherwise = (while a)
+
+
