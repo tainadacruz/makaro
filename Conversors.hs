@@ -2,13 +2,24 @@ module Conversors where
     import Matriz
 
     -- Converte Matriz em formato String
-    -- Usa o (getFixedValue que a gente criou)
+    
+    arrowString:: Value -> String
+    arrowString x | ((getArrowValue x) == 1) = ">"
+                  | ((getArrowValue x) == 2) = "v"
+                  | ((getArrowValue x) == 3) = "<"
+                  | ((getArrowValue x) == 4) = "^"
+
+    blackString:: Value  -> String
+    blackString x = "#"
+
     valueToChar:: Value -> String
-    valueToChar x = show (getFixedValue( x) )
+    valueToChar x | (isArrow x == True) = (arrowString (x))
+                  | (isBlack x == True) = (blackString (x))
+                  | otherwise = show (getFixedValue(x))
 
     rowToString:: Row -> String 
     rowToString [] = "\n"
-    rowToString ((a,b,c,d):xs) = "["++(valueToChar d)++"]" ++ rowToString xs
+    rowToString ((a,b,c,d):xs) = "[ "++(valueToChar d)++" ]" ++ rowToString xs
 
     gridToString::Grid -> String
     gridToString [] = "\n"

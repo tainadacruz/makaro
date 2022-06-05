@@ -74,3 +74,7 @@ module Matriz where
     isArrow :: Value -> Bool
     isArrow (Arrow _) = True
     isArrow _ = False
+
+    isBlack :: Value -> Bool
+    isBlack (Black) = True
+    isBlack _ = False
