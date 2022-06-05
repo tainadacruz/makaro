@@ -10,11 +10,14 @@ module Main (main) where
 
 
     main = do
-        print "while"
-        let makaro_pos_while = while makaro 
-        putStrLn (gridToString makaro_pos_while)
+        --print "while"
+        --let makaro_pos_while = while makaro 
+        --putStrLn (gridToString makaro_pos_while)
         let makaro_solved = backtracking [makaro]
-        print "backtracking"
+        putStrLn " -------------------"
+        putStrLn "|   MAKARO SOLVER   |"
+        putStrLn " -------------------"
+        putStrLn ""
         putStrLn (gridToString makaro_solved)
 
         
