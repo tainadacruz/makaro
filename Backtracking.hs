@@ -47,7 +47,7 @@ module Backtracking where
         | isMember a descarta = choiceNumber b descarta
         | otherwise = a
 
-    -- Pega a melhor Celula para chutar 
+    -- Retorna a melhor Celula para chutar 
     getBestCell::Grid -> Int -> Maybe Cell
     getBestCell a 10 = Nothing
     getBestCell a n = let 
@@ -56,33 +56,36 @@ module Backtracking where
             then getCellWithPossibility_N_fromGrid a (n+1)
             else resp
 
-    
-
+    -- Pega primeiro numero de um Value 
     valueHead:: Value -> Value  
     valueHead (Possible []) = Possible []
     valueHead (Possible a) = Fixed (a !! 0 )
 
+    -- Pega tail de um Value 
     valueTail::Value -> Value 
     valueTail a = Possible( tail (getPossibleValue a))
 
+    -- gera Todas as Grids a partir de uma Celula
     generateGrids:: Grid -> Cell -> [Grid]
     generateGrids grid (a,b,c,d) 
         | getFixedValue d > 0 =  [putCellOnGrid grid (a,b,c,d)]
         | otherwise = [putCellOnGrid grid (a,b,c, valueHead d)] ++ generateGrids grid (a,b,c,valueTail d)
             
 
+    -- Retorna True se a coluna e a linha da celulas dadas são iguais
     isSamePosition:: Cell -> Cell -> Bool
     isSamePosition (a,b,c,d) (aT,bT,cT,dT)
         | (a == aT) && (b == bT) = True 
         | otherwise = False
 
+    -- Coloca Celula na linha dela
     putNumberOnRow:: Row -> Cell -> Row
     putNumberOnRow [] cell = []
     putNumberOnRow (x:xs) cell 
         | isSamePosition x cell = [cell] ++ putNumberOnRow xs cell
         | otherwise = [x] ++ putNumberOnRow xs cell
 
-
+    -- Coloca grid na linha e coluna especificada
     putCellOnGrid:: Grid -> Cell -> Grid
     putCellOnGrid [] cell = []
     putCellOnGrid (x:xs) cell = [(putNumberOnRow x cell)] ++ putCellOnGrid xs cell  
@@ -121,15 +124,26 @@ module Backtracking where
             then while newGrid 
             else newGrid 
 
-    mayToGo:: Maybe Cell -> Cell
-    mayToGo Nothing = (0,0,0,Fixed 0)
-    mayToGo (Just a) = a 
+    -- Converte maybe Cell to Cell
+    mayToCell:: Maybe Cell -> Cell
+    mayToCell Nothing = (0,0,0,Fixed 101)
+    mayToCell (Just a) = a 
 
+    -- backtracking normal 
     backtracking:: [Grid] -> Grid
     backtracking [] = []
     backtracking (a:b)
-        | hasPossible (while a ) = backtracking ((generateGrids (while a)(mayToGo (getBestCell (while a )  2))) ++ b)
+        | hasPossible (while a ) = backtracking ((generateGrids (while a)(mayToCell (getBestCell (while a )  2))) ++ b)
         | hasImpossible (while a)= backtracking b 
         | otherwise = (while a)
+
+    
+    -- backtracking que retorna o array produzido
+    backtrackingArray:: [Grid] -> [Grid]
+    backtrackingArray [] = []
+    backtrackingArray (a:b)
+        | hasPossible (while a ) = (backtrackingArray ((generateGrids (while a)(mayToCell (getBestCell (while a )  2)))) ++ b)
+        | hasImpossible (while a)= backtrackingArray b 
+        | otherwise = [a] ++ b
 
 
