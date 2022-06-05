@@ -125,7 +125,7 @@ module Backtracking where
     -- Roda enquanto tiver possibilidades
     while::Grid -> Grid
     while grid  = let
-        newGrid = tiraPossibilidades grid (amountOfRegions makaro)
+        newGrid = tiraPossibilidades grid (amountOfRegions grid)
         in if (hasPossible newGrid && not (newGrid == grid) )
             then while newGrid 
             else newGrid 
