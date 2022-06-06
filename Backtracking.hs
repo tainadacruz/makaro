@@ -10,7 +10,14 @@ module Backtracking where
     empilha var pilha = [var] ++ pilha
 
     desempilha:: [n] -> [n]
-    desempilha (a:b) = b 
+    desempilha (a:b) = b
+
+    -- pega o maior valor de uma lista
+    maxValueList::[Int] -> Int -> Int
+    maxValueList (a:[]) valor | (a > valor) = a
+                              | otherwise = valor
+    maxValueList (a:b) valor | (a > valor) = maxValueList b a
+                             | otherwise = maxValueList b valor
 
     -- retorna tamanho de um Value da celula 
     getValueArraySize :: Value -> Int 
@@ -58,7 +65,7 @@ module Backtracking where
     getBestCell::Grid -> Int -> Maybe Cell
     getBestCell a n = let 
         resp = getCellWithPossibility_N_fromGrid a n 
-        in if (resp == Nothing && n <= (head (getListaMaxPossibildadesPorRegiao a 1)))
+        in if (resp == Nothing && n <= (maxValueList (getListaMaxPossibildadesPorRegiao a 0) 0))
             then getBestCell a (n+1)
             else resp
 

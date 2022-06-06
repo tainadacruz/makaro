@@ -1,8 +1,6 @@
 module Verification where
     import Matriz
 
-    colunas = 8
-
     -- Função que retorna o elemento de um array em determinada posição
     percorrer array pos = array !! pos
 
@@ -23,23 +21,29 @@ module Verification where
     arrowVerificationFunction :: Grid -> Int -> Int -> [Int]
     arrowVerificationFunction grid a b = (arrowVerificationCell (percorrer (percorrer grid (a-1)) (b-1)))
 
+    getLastCell :: Row -> Cell
+    getLastCell row = last row
+
+    getQuantidadeColunas :: Grid -> Int
+    getQuantidadeColunas grid = getCol (getLastCell (last grid))
+
     verificarAdjacentsOfArrow :: Cell -> Grid -> [Int]
     verificarAdjacentsOfArrow (a, b, c, d) grid = if a <= 1 then
                                             (if b <= 1 then
                                                 (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid (a+1) b)
                                             else
-                                                (if b >= colunas then
+                                                (if b >= (getQuantidadeColunas grid) then
                                                     (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid (a+1) b)
                                                 else
                                                     (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid (a+1) b) 
                                                     )
                                                 )
                                         else
-                                            (if a >= colunas then
+                                            (if a >= (getQuantidadeColunas grid) then
                                                 (if b <= 1 then
                                                     (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid (a-1) b)
                                                 else
-                                                    (if b >= colunas then
+                                                    (if b >= (getQuantidadeColunas grid) then
                                                         (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid (a-1) b)
                                                     else
                                                         (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid (a-1) b)
@@ -49,7 +53,7 @@ module Verification where
                                                 (if b <= 1 then
                                                     (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid (a-1) b) ++ (arrowVerificationFunction grid (a+1) b)
                                                 else
-                                                    (if b >= colunas then
+                                                    (if b >= (getQuantidadeColunas grid) then
                                                         (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid (a-1) b) ++ (arrowVerificationFunction grid (a+1) b)
                                                     else
                                                         (arrowVerificationFunction grid a (b+1)) ++ (arrowVerificationFunction grid a (b-1)) ++ (arrowVerificationFunction grid (a-1) b) ++ (arrowVerificationFunction grid (a+1) b)
@@ -125,18 +129,18 @@ module Verification where
                                             (if b <= 1 then
                                                 verifyLeftTopCornerCell a b grid
                                             else
-                                                (if b >= colunas then
+                                                (if b >= (getQuantidadeColunas grid) then
                                                     verifyRightTopCornerCell a b grid
                                                 else
                                                     verifyTopLineCell a b grid
                                                     )
                                                 )
                                         else
-                                            (if a >= colunas then
+                                            (if a >= (getQuantidadeColunas grid) then
                                                 (if b <= 1 then
                                                     verifyLeftBottomCornerCell a b grid
                                                 else
-                                                    (if b >= colunas then
+                                                    (if b >= (getQuantidadeColunas grid) then
                                                         verifyRightBottomCornerCell a b grid
                                                     else
                                                         verifyBottomLineCell a b grid
@@ -146,7 +150,7 @@ module Verification where
                                                 (if b <= 1 then
                                                     verifyLeftLineCell a b grid
                                                 else
-                                                    (if b >= colunas then
+                                                    (if b >= (getQuantidadeColunas grid) then
                                                         verifyRightLineCell a b grid
                                                     else
                                                         verifyMidCell a b grid

@@ -20,22 +20,11 @@ module Main (main) where
         [(8,1,8,Possible []),(8,2,8,Possible []),(8,3,8,Possible []),(8,4,8,Possible []),(8,5,8,Possible []),(8,6,8,Possible []),(8,7,8,Possible []),(8,8,8,Possible []),(8,9,8,Possible [])],
         [(9,1,9,Possible []),(9,2,9,Possible []),(9,3,9,Possible []),(9,4,9,Possible []),(9,5,9,Possible []),(9,6,9,Possible []),(9,7,9,Possible []),(9,8,9,Possible []),(9,9,9,Possible [])]]
 
-    allToString:: [Grid] -> Int -> String
-    allToString [] n = "lista vazia"
-    allToString array 0 = gridToString (array !! 0)
-    allToString array n = gridToString (array !! n) ++ "\n" ++ allToString array (n-1)
-
 
     main = do
-        --print "while"
-        --let makaro_pos_while = while makaro 
-        --putStrLn (gridToString makaro_pos_while)
         print "matriz"
-        let valor = getListaMaxPossibildadesPorRegiao makaro 0 
         putStrLn (gridToString makaro)
-        print valor
         let makaro_set = setListsOfPossibilities makaro
-        print  (getListaMaxPossibildadesPorRegiao makaro_set 0)
         let makaro_solved = backtracking [makaro_set]
         putStrLn " -------------------"
         putStrLn "|   MAKARO SOLVER   |"
