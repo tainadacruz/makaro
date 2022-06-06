@@ -1,7 +1,6 @@
 module Verification where
     import Matriz
 
-    linhas = 8
     colunas = 8
 
     -- Função que retorna o elemento de um array em determinada posição
