@@ -4,6 +4,7 @@ module Backtracking where
     import Prunning
     import Transform
     import Verification
+    import ParseNewMatrix
 
     empilha:: n -> [n] -> [n]
     empilha var pilha = [var] ++ pilha
@@ -55,11 +56,10 @@ module Backtracking where
 
     -- Retorna a melhor Celula para chutar 
     getBestCell::Grid -> Int -> Maybe Cell
-    getBestCell a 10 = Nothing
     getBestCell a n = let 
         resp = getCellWithPossibility_N_fromGrid a n 
-        in if (resp == Nothing)
-            then getCellWithPossibility_N_fromGrid a (n+1)
+        in if (resp == Nothing && n <= (head (getListaMaxPossibildadesPorRegiao a 1)))
+            then getBestCell a (n+1)
             else resp
 
     -- Pega primeiro numero de um Value 
