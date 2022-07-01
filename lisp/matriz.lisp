@@ -7,7 +7,7 @@
 )
 
 (defun create(a b c list_of_possibilities)
-    (setq p1
+    (setq celula
         (make-cell 
             :arrow a
             :black b
@@ -15,7 +15,7 @@
             :possibilities list_of_possibilities
         )
     )
-    p1
+    celula
 )
 
 ;;;;;;; Funções
