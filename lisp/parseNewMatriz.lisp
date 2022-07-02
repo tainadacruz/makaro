@@ -1,5 +1,4 @@
 (load "matriz") 
-(load "makaro2")
 
 ;; Retorna quantidade de celulas por regiao
 (defun getQuantidadeDeCelulasParaRegiao(matriz regiao)
