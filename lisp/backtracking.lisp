@@ -1,3 +1,10 @@
+(load "prunning") 
+(load "verification") 
+
+(defun tiraPossibilidades(matriz)
+    (prunning matriz)
+    (verifyOrthogonallyAdjacency matriz)
+)
 
 (defun get-cell(grid)
     (loop for list in grid do
