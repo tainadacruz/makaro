@@ -18,22 +18,11 @@
 
 
 ; retorna nova matriz com a lista de possibilidades atualizadas para uma região
-(defun removeValues(fixedValues cellList)
-    (setq novaLista (list ))
-    (loop for value in cellList do
-        (if (not (find value fixedValues))
-            (setf novaLista (concatenate 'list novaLista (list value)))
-        )
-    )
-    novaLista
-)
-
-
 (defun deleteFixedValuesOfRegions(matriz regiao fixedValues)
     (loop for linha in matriz do
         (loop for celula in linha do
             (if (and (isPossible celula) (= (getRegion celula) regiao))
-                (setf (cell-possibilities celula) (removeValues fixedValues (cell-possibilities celula)))
+                (setf (cell-possibilities celula) (filtrar (cell-possibilities celula) fixedValues))
             )
         )
     )

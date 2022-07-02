@@ -1,0 +1,191 @@
+(load "matriz")
+
+; Bloco para checar as possibilidades de acordo com as regras:
+    ; Same numbers must not be orthogonally adjacent.
+    ; An arrow in a black cell points to the orthogonally adjacent cell with the absolutely highest number.
+
+    ; Arrow: 1 - direita, 2 - baixo, 3 - esquerda, 4 - cima
+    ; quando (b+1) -> para direita -> flecha estaria apontando para a esquerda -> 3
+    ; quando (b-1) -> para esquerda -> flecha estaria apontando para a direita -> 1
+    ; quando (a+1) -> para baixo -> flecha estaria apontando para cima -> 4
+    ; quando (a-1) -> para cima -> flecha estaria apontando para baixo -> 2 
+
+(defun defineList(actualNumber maxNumber)
+    (if (< actualNumber maxNumber)
+        (concatenate 'list (list actualNumber) (defineList (+ actualNumber 1) maxNumber))
+        (list actualNumber)
+    )
+)
+
+(defun arrowVerificationCell(celula)
+    (if (isFixed celula)
+        (defineList 1 (getFixedValue celula))
+        (list )
+    )
+)
+
+(defun arrowVerificationFunction(matriz linha coluna)
+    (arrowVerificationCell (nth coluna (nth linha listPossibilities)))
+)
+
+(defun verificarAdjacentsOfArrow(linha coluna matriz)
+    (setq quantidadeColunas (getQuantidadeColunas matriz))
+    (if (<= linha 1)
+        (if (<= coluna 1)
+            (concatenate 'list (arrowVerificationFunction matriz linha (+ coluna 1)) (arrowVerificationFunction matriz (+ linha 1) coluna))
+            (if (>= coluna quantidadeColunas)
+                (concatenate 'list (arrowVerificationFunction matriz linha (- coluna 1)) (arrowVerificationFunction matriz (+ linha 1) coluna))
+                (concatenate 'list (arrowVerificationFunction matriz linha (- coluna 1)) (arrowVerificationFunction matriz linha (+ coluna 1)) (arrowVerificationFunction matriz (+ linha 1) coluna))
+            )
+        )
+        (if (>= linha quantidadeColunas)
+            (if (<= coluna 1)
+                (concatenate 'list (arrowVerificationFunction matriz linha (+ coluna 1)) (arrowVerificationFunction matriz (- linha 1) coluna))
+                (if (>= coluna quantidadeColunas)
+                    (concatenate 'list (arrowVerificationFunction matriz linha (- coluna 1)) (arrowVerificationFunction matriz (- linha 1) coluna))
+                    (concatenate 'list (arrowVerificationFunction matriz linha (- coluna 1)) (arrowVerificationFunction matriz linha (+ coluna 1)) (arrowVerificationFunction matriz (- linha 1) coluna))
+                )
+            )
+            (if (<= coluna 1)
+                (concatenate 'list (arrowVerificationFunction matriz linha (+ coluna 1)) (arrowVerificationFunction matriz (- linha 1) coluna 1) (arrowVerificationFunction matriz (+ linha 1) coluna))
+                (if (>= coluna quantidadeColunas)
+                    (concatenate 'list (arrowVerificationFunction matriz linha (- coluna 1)) (arrowVerificationFunction matriz (- linha 1) coluna 1) (arrowVerificationFunction matriz (+ linha 1) coluna))
+                    (concatenate 'list (arrowVerificationFunction matriz linha (- coluna 1)) (arrowVerificationFunction matriz linha (+ coluna 1)) (arrowVerificationFunction matriz (- linha 1) coluna 1) (arrowVerificationFunction matriz (+ linha 1) coluna))
+                )
+            )
+        )
+    )
+)
+
+(defun arrowsDirectionVerificationCell(celula)
+    (if (isFixed celula)
+        (getValue celula)
+        (list )
+    )
+)
+
+(defun arrowsDirectionVerificationFunction(matriz linha coluna)
+    (arrowsDirectionVerificationCell (nth coluna (nth linha listPossibilities)))
+)
+
+(defun verificarMaiorValorDirecaoArrow(celula linha coluna direcao)
+    (if (= (getArrowDirection celula) 1)
+        (arrowsDirectionVerificationFunction matriz linha (+ coluna 1))
+        (if (= (getArrowDirection celula) 2)
+            (arrowsDirectionVerificationFunction matriz (+ linha 1) coluna)
+            (if (= (getArrowDirection celula) 3)
+                (arrowsDirectionVerificationFunction matriz linha (- coluna 1))
+                (arrowsDirectionVerificationFunction matriz (- linha 1) coluna)
+            )
+        )
+    )
+)
+
+(defun getArrowDirection(celula linha coluna direcao matriz)
+    (if (= (getArrowValue celula) direcao)
+        (verificarAdjacentsOfArrow linha coluna matriz)
+        (verificarMaiorValorDirecaoArrow celula linha coluna matriz)
+    )
+)
+
+;recebe a direção que a flecha teria que ter para que a celula adjacente aponte para a célula original verificada
+(defun genericVerification(matriz linha coluna direcao)
+    (setq i 0)
+    (setq j 0)
+    (setq listaValores (list ))
+    (loop for line in matriz do
+        (loop for celula in line do
+            (if (and (= i linha) (= j coluna))
+                (if (isFixed celula)
+                    (concatenate 'list listaValores (cell-possibilities celula))
+                    (if (isArrow celula)
+                        (getArrowDirection celula i j direcao matriz)
+                    )    
+                )
+            )
+            (setf j (+ j 1))
+        )
+        (setf i (+ i 1))
+    )
+    listaValores
+)
+
+(defun verifyLeftTopCornerCell(linha coluna matriz)
+    (concatenate 'list (genericVerification matriz (+ linha 1) coluna 4) (genericVerification matriz linha (+ coluna 1) 3))
+)
+
+(defun verifyRightTopCornerCell(linha coluna matriz)
+    (concatenate 'list (genericVerification matriz (+ linha 1) coluna 4) (genericVerification matriz linha (- coluna 1) 1))
+)
+
+(defun verifyRightBottomCornerCell(linha coluna matriz)
+    (concatenate 'list (genericVerification matriz (- linha 1) coluna 2) (genericVerification matriz linha (- coluna 1) 1))
+)
+
+(defun verifyLeftBottomCornerCell(linha coluna matriz)
+    (concatenate 'list (genericVerification matriz (- linha 1) coluna 2) (genericVerification matriz linha (+ coluna 1) 3))
+)
+
+(defun verifyBottomLineCell(linha coluna matriz)
+    (concatenate 'list (genericVerification matriz (- linha 1) coluna 2) (genericVerification matriz linha (+ coluna 1) 3) (genericVerification matriz linha (- coluna 1) 1))
+)
+
+(defun verifyTopLineCell(linha coluna matriz)
+    (concatenate 'list (genericVerification matriz (+ linha 1) coluna 4) (genericVerification matriz linha (+ coluna 1) 3) (genericVerification matriz linha (- coluna 1) 1))
+)
+
+(defun verifyLeftLineCell(linha coluna matriz)
+    (concatenate 'list (genericVerification matriz (- linha 1) coluna 2) (genericVerification matriz (+ linha 1) coluna 4) (genericVerification matriz linha (+ coluna 1) 3))
+)
+
+(defun verifyRightLineCell(linha coluna matriz)
+    (concatenate 'list (genericVerification matriz (- linha 1) coluna 2) (genericVerification matriz (+ linha 1) coluna 4) (genericVerification matriz linha (- coluna 1) 1))    
+)
+
+(defun verifyMidCell(linha coluna matriz)   
+    (concatenate 'list (genericVerification matriz (- linha 1) coluna 2) (genericVerification matriz (+ linha 1) coluna 4) (genericVerification matriz linha (+ coluna 1) 3) (genericVerification matriz linha (- coluna 1) 1))    
+)
+
+(defun getAdjacentValues(matriz linha coluna)
+    (setq quantidadeColunas (getQuantidadeColunas matriz))
+    (if (<= linha 1)
+        (if (<= coluna 1)
+            (verifyLeftTopCornerCell linha coluna matriz)
+            (if (>= coluna quantidadeColunas)
+                (verifyRightTopCornerCell linha coluna matriz)
+                (verifyTopLineCell linha coluna matriz)
+            )
+        )
+        (if (>= linha quantidadeColunas)
+            (if (<= coluna 1)
+                (verifyLeftBottomCornerCell linha coluna matriz)
+                (if (>= coluna quantidadeColunas)
+                    (verifyRightBottomCornerCell linha coluna matriz)
+                    (verifyBottomLineCell linha coluna matriz)
+                )
+            )
+            (if (<= coluna 1)
+                (verifyLeftLineCell linha coluna matriz)
+                (if (>= coluna quantidadeColunas)
+                    (verifyRightLineCell linha coluna matriz)
+                    (verifyMidCell linha coluna matriz)
+                )
+            )
+        )
+    )
+)
+
+(defun verifyOrthogonallyAdjacency(matriz)
+    (setq i 0)
+    (setq j 0)
+    (loop for linha in matriz do
+        (loop for celula in linha do
+            (if (isPossible celula)
+                (setf (cell-possibilities celula) (filtrar (cell-possibilities celula) (getAdjacentValues matriz i j)))
+            )
+            (setf j (+ 1 j))
+        )
+        (setf i (+ i 1))
+    )
+
+)

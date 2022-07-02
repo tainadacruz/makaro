@@ -29,6 +29,24 @@
     (cell-possibilities celula)
 )
 
+(defun getFixedValue(celula)
+    (setq lista (cell-possibilities celula))
+    (setq valor 0)
+    (loop for value in lista do
+        (setf valor value)
+    )
+    valor
+)
+
+(defun getArrowValue(celula)
+    (setq lista (cell-possibilities celula))
+    (setq valor 0)
+    (loop for value in lista do
+        (setf valor value)
+    )
+    valor
+)
+
 
 ;;;;;;; Booleans
 
@@ -89,3 +107,11 @@
     )
     maiorRegiao
 ) 
+
+(defun getQuantidadeColunas(matriz)
+    (setq quantidadeColunas 0)
+    (loop for linha in matriz do
+        (setf quantidadeColunas (+ quantidadeColunas 1))
+    )
+    quantidadeColunas
+)

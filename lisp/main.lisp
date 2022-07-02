@@ -1,6 +1,7 @@
 (load "makaro2")
 (load "parseNewMatriz")
 (load "prunning")
+(load "verification")
 
 (defun main()
 
@@ -18,6 +19,13 @@
 
     (prunning matrizMakaro2)
     (write matrizMakaro2)
+
+    (terpri)
+    (terpri)
+
+    (verifyOrthogonallyAdjacency matrizMakaro2)
+    (write matrizMakaro2)
+
 )
 
 (main)
