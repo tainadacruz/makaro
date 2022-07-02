@@ -33,7 +33,7 @@
 ;;;;;;; Booleans
 
 (defun isPossible(celula)
-    (or (cell-arrow celula) (cell-black celula)
+    (if (or (cell-arrow celula) (cell-black celula))
         NIL
         (if (< 1 (length (cell-possibilities celula)))
             T
@@ -43,7 +43,7 @@
 )
 
 (defun isFixed(celula)
-    (or (cell-arrow celula) (cell-black celula)
+    (if (or (cell-arrow celula) (cell-black celula))
         NIL
         (if (= 1 (length (cell-possibilities celula)))
             T
