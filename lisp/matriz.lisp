@@ -18,21 +18,6 @@
     celula
 )
 
-;;;;;;; Funções
-
-(defun estaNaLista(x fixedValues)
-    (if (find x fixedValues) t nil)
-)
-
-(defun filtrar(listaDeRetorno valoresARetirar)
-    (if (null listaDeRetorno)
-        ()
-        (if (estaNaLista (car listaDeRetorno) valoresARetirar)
-            (filtrar (cdr listaDeRetorno) valoresARetirar)
-            (cons (car listaDeRetorno) (filtrar (cdr listaDeRetorno) valoresARetirar))
-        )
-    )
-)
 
 ;;;;;;; Getters
 
@@ -43,6 +28,7 @@
 (defun getValue(celula)
     (cell-possibilities celula)
 )
+
 
 ;;;;;;; Booleans
 
@@ -73,3 +59,33 @@
 (defun isBlack(celula)
     (cell-black celula)
 )
+
+
+;;;;;;; Funções
+
+(defun estaNaLista(x fixedValues)
+    (if (find x fixedValues) t nil)
+)
+
+(defun filtrar(listaDeRetorno valoresARetirar)
+    (if (null listaDeRetorno)
+        ()
+        (if (estaNaLista (car listaDeRetorno) valoresARetirar)
+            (filtrar (cdr listaDeRetorno) valoresARetirar)
+            (cons (car listaDeRetorno) (filtrar (cdr listaDeRetorno) valoresARetirar))
+        )
+    )
+)
+
+(defun amountOfRegions(matriz)
+    (setq maiorRegiao 0)
+    (loop for linha in matriz do
+        (loop for celula in linha do
+            (setq regiaoAtual (getRegion celula))
+            (if (> regiaoAtual maiorRegiao)
+                (setf maiorRegiao regiaoAtual)
+            )
+        )
+    )
+    maiorRegiao
+) 
