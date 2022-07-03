@@ -2,10 +2,10 @@
 
 (defun arrowString(x)
     (cond
-       ( (= x 1) ">" )
-       ( (= x 1) ">" )
-       ( (= x 1) ">" )
-       ( (= x 1) ">" )
+       ( (= x 1) (char '">" ))
+       ( (= x 1) (char '">" ))
+       ( (= x 1) (char '">" ))
+       ( (= x 1) (char '">" ))
     )
 )
 
@@ -18,7 +18,7 @@
     (if (isArrow x)
         (setq p (arrowString x))
         (if (isBlack x)
-            (setq p (char '"#"))
+            (setq p (blackString x))
             ()
         ))
     (if (and (not arrowString x) (not blackString x))
