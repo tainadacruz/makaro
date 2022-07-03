@@ -31,8 +31,20 @@
 (defun gridToString(matriz)
     (loop for line in matriz do
         (loop for celula in line do
-           (setf celula (concatenate 'list (valueToChar celula)))
+            (if (isFixed celula)
+                (setf p (concatenate 'list p (cell-possibilities celula)))
+                (if (isArrow celula)
+                    (setf p (valueToChar (cell-arrow celula)))
+                    (if (isBlack celula)
+                        (setf p (valueToChar (cell-black celula)))
+                    )
+                 
+                )    
+            )
+
         )
+        (write-line p)
+        
     )
 )
 
