@@ -2,16 +2,16 @@
 
 (defun arrowString(x)
     (cond
-       ( (= x 1) (char '">" ))
-       ( (= x 1) (char '">" ))
-       ( (= x 1) (char '">" ))
-       ( (= x 1) (char '">" ))
+       ( (= x 1) (write '\> ))
+       ( (= x 2) (write '\v ))
+       ( (= x 3) (write '\< ))
+       ( (= x 4) (write '\^ ))
     )
 )
 
 ;parece que é assim que define char
 (defun blackString(x)
-    (setf x (char '"#"))
+    (setf x (string '"#"))
 )
 
 (defun valueToChar(x)
@@ -21,43 +21,22 @@
             (setq p (blackString x))
             ()
         ))
-    (if (and (not arrowString x) (not blackString x))
+    (if (and (not (isArrow x)) (not (isBlack x)))
         (setq p string (getValue x))
         ()
     )
     p
 )
 
-(defun gridToString(matriz)
-    (loop for line in matriz do
-        (setq p (list ))
-        (loop for celula in line do
-            (if (or (isFixed celula) (isPossible celula))
-                (setf p (concatenate 'list p (valueToChar (cell-possibilities celula))))
-                (if (isArrow celula)
-                    (setf p (valueToChar (cell-arrow celula)))
-                    (if (isBlack celula)
-                        (setf p (valueToChar (cell-black celula)))
-                    )
-                 
-                )    
-            )
-
-        )
-        (write-line p)
-        
-    )
-)
-(defun grid-printer(grid)
-
+(defun gridToString(grid)
     (loop for list in grid do
-        (loop for cell in list do
+        (loop for celula in list do
             (write-char #\[ )
-            (if (isArrow cell)
-                (write '\>)
-                (if (isBlack cell)
-                    (write "#\#")
-                    (write (cell-possibilities cell))
+            (if (isArrow celula)
+                (setf p (valueToChar celula))
+                (if (isBlack celula)
+                    (write "\#")
+                    (write (cell-possibilities celula))
                 )
             )
             (write '\])

@@ -28,6 +28,9 @@
     (verifyOrthogonallyAdjacency matrizMakaro2)
     (write matrizMakaro2)
 
+    (terpri)
+    (terpri)
+
     (write (gridToString matrizMakaro2))
 
 )
