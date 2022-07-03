@@ -16,13 +16,13 @@
 
 (defun valueToChar(x)
     (if (isArrow x)
-        (setq p (arrowString x))
+        (setq p (arrowString (getArrowValue x)))
         (if (isBlack x)
             (setq p (blackString x))
             ()
         ))
     (if (and (not arrowString x) (not blackString x))
-        (setq p string getFixedValue x)
+        (setq p string (getValue x))
         ()
     )
     p
@@ -30,9 +30,10 @@
 
 (defun gridToString(matriz)
     (loop for line in matriz do
+        (setq p (list ))
         (loop for celula in line do
-            (if (isFixed celula)
-                (setf p (concatenate 'list p (cell-possibilities celula)))
+            (if (or (isFixed celula) (isPossible celula))
+                (setf p (concatenate 'list p (valueToChar (cell-possibilities celula))))
                 (if (isArrow celula)
                     (setf p (valueToChar (cell-arrow celula)))
                     (if (isBlack celula)
