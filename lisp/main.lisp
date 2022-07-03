@@ -31,7 +31,7 @@
     (terpri)
     (terpri)
 
-    (write (gridToString matrizMakaro2))
+    (gridToString matrizMakaro2)
 
 )
 
