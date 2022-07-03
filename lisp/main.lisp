@@ -1,4 +1,4 @@
-(load "makaro2")
+(load "makaro")
 (load "parseNewMatriz")
 (load "prunning")
 (load "verification")
