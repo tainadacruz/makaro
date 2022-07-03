@@ -2,6 +2,7 @@
 (load "parseNewMatriz")
 (load "prunning")
 (load "verification")
+(load "conversors")
 
 (defun main()
 
@@ -25,6 +26,8 @@
 
     (verifyOrthogonallyAdjacency matrizMakaro2)
     (write matrizMakaro2)
+
+    (write (gridToString matrizMakaro2))
 
 )
 
