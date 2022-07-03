@@ -13,48 +13,66 @@
     )
 )
 
-(defun get-cell(grid)
-    (loop for list in grid do
-        (setq t1 NIL)
-        (loop for cell in list do
-            (if (is-cell cell) 
-                (if (> (length (cell-possibilities cell) ) 1 )
-                (progn (setq t1 T) (let ((best-cell 'cell)) (return))
+;(defun get-cell(grid)
+;    (loop for list in grid do
+;        (setq t1 NIL)
+;        (loop for cell in list do
+;            (if (is-cell cell) 
+;                (if (> (length (cell-possibilities (cell) ) 1 ))
+;                    (progn (setq t1 T) (setq best-cell cell) (return))
+;                    ()
+;               )
+;;             )
+;;         )
+;;         (if t1
+;;         (return)
+;;         ()
+;;         )
+;;     )
+;;     (copy-structure best-cell)
+;; )
+
+(defun get-cell-index(grid)
+    (setq t1 NIL)
+    (dotimes (i (length grid))
+        (dotimes (j (length (nth 0 grid)))
+            (setq q (cell-by-index grid i j))
+            (if (is-cell q) 
+                (if (> (length (cell-possibilities q) ) 1 )
+                    (progn (setq t1 T) (setq retorno (list i j)) (return))
+                    ()
                 )
-                ()
             )
         )
         (if t1
         (return)
         ()
         )
-    )
-    best-cell
-)
 
-(defun get-cell-index(grid)
-    (dotimes (i (length grid))
-        (dotimes (j (length (nth 0 grid)))
-        (print (nth i (nth j matriz)))
-        (print (+ (* i 8) j))
-        )
     )
-
+    retorno
 )
 
 (defun set-cell(matriz i j cell)
-    (setf (nth i (nth j matriz) ) cell )
-
+    (setq new-matriz  (copy-tree matriz))
+    (setf (nth i (nth j new-matriz) ) cell )
+    new-matriz
+)
+(defun cell-by-index(matriz i j)
+    (copy-structure (nth i (nth j matriz) ))  
 )
 
-(defun generate-grids(grid cell)
-    (setq stack (list ()))
+(defun generate-grids(grid cell-pos stack)
+    (setq cell (cell-by-index grid (nth 1 cell-pos) (nth 0 cell-pos)))
     (loop for option in (cell-possibilities cell) do 
         (print option)
-        (setq q1 cell)
-        (setf (cell-possibilities q1) option)
-        (print q1)
-        (cons q1 stack)
+        (setf (cell-possibilities cell) option)
+        (push 
+        (set-cell grid (nth 1 cell-pos) (nth 0 cell-pos) cell) 
+        stack
+        )
+        (print "====---")
         (print stack)
     )
+
 )

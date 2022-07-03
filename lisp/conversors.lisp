@@ -48,5 +48,22 @@
         
     )
 )
+(defun grid-printer(grid)
 
+    (loop for list in grid do
+        (loop for cell in list do
+            (write-char #\[ )
+            (if (isArrow cell)
+                (write '\>)
+                (if (isBlack cell)
+                    (write "#\#")
+                    (write (cell-possibilities cell))
+                )
+            )
+            (write '\])
+            (write-char #\Space )
 
+        )
+        (terpri)
+    )
+)

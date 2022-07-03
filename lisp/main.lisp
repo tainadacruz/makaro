@@ -3,6 +3,7 @@
 (load "prunning")
 (load "verification")
 (load "conversors")
+(load "backtracking")
 
 (defun main()
 
