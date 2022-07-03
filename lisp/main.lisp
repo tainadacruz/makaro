@@ -6,22 +6,18 @@
 (load "backtracking")
 
 (defun main()
-
     (setq matrizMakaro2 (returnMakaro))
-    
-    (terpri)
-    (terpri)
-    
-    (setListsOfPossibilities matrizMakaro2)
     (gridToString matrizMakaro2)
 
+    (setListsOfPossibilities matrizMakaro2)
+    
     (setq stack ())
     (push matrizMakaro2 stack)
+
     (print "----")
     (terpri)
-    (gridToString (backtracking stack))
     
-
+    (gridToString (backtracking stack))
 )
 
 (main)
