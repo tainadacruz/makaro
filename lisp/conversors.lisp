@@ -33,7 +33,11 @@
         (loop for celula in list do
             (write-char #\[ )
             (if (isArrow celula)
+            (progn 
+                (write-char #\Space)
                 (setf p (valueToChar celula))
+                (write-char #\Space)
+            )
                 (if (isBlack celula)
                     (write "\#")
                     (write (cell-possibilities celula))

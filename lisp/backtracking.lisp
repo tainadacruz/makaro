@@ -1,9 +1,14 @@
 (load "prunning") 
 (load "verification") 
+(load "conversors")
 
 (defun tiraPossibilidades(matriz)
     (prunning matriz)
     (verifyOrthogonallyAdjacency matriz)
+    matriz
+)
+(defun while(matriz)
+    tiraPossibilidades( matriz)
 )
 
 (defun is-cell(cell)
@@ -65,14 +70,88 @@
 (defun generate-grids(grid cell-pos stack)
     (setq cell (cell-by-index grid (nth 1 cell-pos) (nth 0 cell-pos)))
     (loop for option in (cell-possibilities cell) do 
-        (print option)
-        (setf (cell-possibilities cell) option)
-        (push 
-        (set-cell grid (nth 1 cell-pos) (nth 0 cell-pos) cell) 
-        stack
-        )
-        (print "====---")
-        (print stack)
+        (setq new (copy-structure cell))
+        (setf (cell-possibilities new) (list option))
+        (setq new-grid (set-cell grid (nth 1 cell-pos) (nth 0 cell-pos) new) )
+        (push (copy-list new-grid) stack)
+      
+    )
+    stack
+)
+
+(defun print-stack(stack)
+    (setq i 1)
+    (print "stack:")
+    (loop for item in stack do
+        (print i)
+        (terpri)
+        (gridToString item)
+        (setq i (+ i 1))
     )
 
+)
+
+(defun hasImpossible (grid)
+    (loop for list in grid do
+        (setq t1 NIL)
+        (loop for cell in list do
+        (if (is-cell cell) 
+            (if (= (length (cell-possibilities cell ) ) 0)
+                (progn (setq t1 T) (setq best-cell cell) (return))
+                    ()
+                )
+                )
+            )
+            (if t1
+            (return)
+            ()
+            )
+    )
+    t1
+)
+
+(defun hasPossible (grid)
+    (loop for list in grid do
+        (setq t1 NIL)
+        (loop for cell in list do
+        (if (is-cell cell) 
+                (if (> (length (cell-possibilities cell ) )1)
+                (progn (setq t1 T) (setq best-cell cell) (return))
+                    ()
+                )
+                )
+            )
+            (if t1
+            (return)
+            ()
+            )
+        )
+        t1
+)
+
+(defun backtracking (stack)
+    (setq grid (car stack))
+    (setq stack (cdr stack))
+    (setq grid (tiraPossibilidades grid ))
+        (if (hasImpossible grid)
+           (backtracking stack) 
+    
+           (if (hasPossible grid)
+            (progn 
+            (setq stack (generate-grids matrizMakaro2 (get-cell-index matrizMakaro2) stack))
+            (backtracking stack)
+            )
+            ()
+        )
+    )
+
+    grid
+)
+
+
+(defun enquanto(grid)
+    (dotimes (i 1)
+        (tiraPossibilidades grid)
+    )
+    grid
 )
