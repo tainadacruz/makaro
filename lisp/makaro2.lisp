@@ -208,7 +208,7 @@
         (create NIL NIL 14 (list 4))
     )
     (setq l7c3
-        (create NIL NIL 13 (list 0))
+        (create NIL NIL 13 (list ))
     )
     (setq l7c4
         (create NIL NIL 12 (list ))
