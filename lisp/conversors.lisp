@@ -9,19 +9,23 @@
     )
 )
 
+;parece que é assim que define char
 (defun blackString(x)
-    (setf x ("#"))
+    (setf x (char '"#"))
 )
 
 (defun valueToChar(x)
     (if (isArrow x)
-        (setf (x) (arrowString x))
+        (setq p (arrowString x))
         (if (isBlack x)
-            (setf (x) "#")
+            (setq p (char '"#"))
+            ()
         ))
     (if (and (not arrowString x) (not blackString x))
-        (setf (x) string getFixedValue x)
+        (setq p string getFixedValue x)
+        ()
     )
+    p
 )
 
 (defun gridToString(matriz)
