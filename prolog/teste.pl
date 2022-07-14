@@ -19,10 +19,9 @@ makaro(2, M) :-
 solucao(TabuleiroSolucao) :-
 	
     Regiao is 3,
-    acharElementosRegiao(Regiao,TabuleiroSolucao, ElementosRegiao),
     writeln('aqui').
 	
-    /*
+/*
     TabuleiroSolucao = tabuleiro[[X11, X12, X13, X14, X15, X16, X17, X18],
                                  [X21, X22, X23, X24, X25, X26, X27, X28],
                                  [X31, X32, X33, X34, X35, X36, X37, X38],
@@ -124,27 +123,54 @@ n(4).
 
 */
 
-acharElementosRegiao(_, [], 0).
-acharElementosRegiao(Regiao, [L|Ls], E) :-
-    acharElementosRegiaoColuna(Regiao, L, RSs),
-    acharElementosRegiao(Regiao, Ls, E1),
+
+/*função para ver os números possíveis daquela célula, baseando-se no número de células da região da célula*/
+
+acharQuantidadeElementosRegiao(_, [], 0).
+acharQuantidadeElementosRegiao(Regiao, [L|Ls], E) :-
+    acharQuantidadeElementosRegiaoColuna(Regiao, L, RSs),
+    acharQuantidadeElementosRegiao(Regiao, Ls, E1),
     E is RSs + E1.
 
-acharElementosRegiaoColuna(_, [], 0).
-acharElementosRegiaoColuna(Regiao, [E|Es], E2) :-
-    acharElementosRegiaoCelula(Regiao, E, E3),
-    acharElementosRegiaoColuna(Regiao, Es, RSs),
+acharQuantidadeElementosRegiaoColuna(_, [], 0).
+acharQuantidadeElementosRegiaoColuna(Regiao, [E|Es], E2) :-
+    acharQuantidadeElementosRegiaoCelula(Regiao, E, E3),
+    acharQuantidadeElementosRegiaoColuna(Regiao, Es, RSs),
     E2 is E3 + RSs.
 
-acharElementosRegiaoCelula(ValorRegiao, cell(ValorRegiao, _), 1).
-acharElementosRegiaoCelula(ValorRegiao, cell(_, _), 0).
+acharQuantidadeElementosRegiaoCelula(ValorRegiao, cell(ValorRegiao, _), 1).
+acharQuantidadeElementosRegiaoCelula(_, cell(_, _), 0).
 
-/*
-completa(cell(0,_), _).
-completa(cell(region,value), matrix) :-
-    n(X1), n(X2), n(X3), n(X4),
-    todosDiferentes([X1, X2, X3, X4]).
+ 
+
+/*terminar função para ver se o número escolhido já não pertence à região daquela célula*/
 
 todosDiferentes([]).
 todosDiferentes([H|T]) :- not(member(H,T)), todosDiferentes(T).
-*/
+
+acharElementosRegiao(_, [], []).
+acharElementosRegiao(Regiao, [L|Ls], E) :-
+    acharElementosRegiaoColuna(Regiao, L, RSs),
+    acharElementosRegiao(Regiao, Ls, E1),
+    append(RSs, E1, E).
+
+acharElementosRegiaoColuna(_, [], []).
+acharElementosRegiaoColuna(Regiao, [cell(Regiao, Elemento)|Es], [Elemento|E2]) :-
+    acharElementosRegiaoColuna(Regiao, Es, E2).
+acharElementosRegiaoColuna(Regiao, [cell(_, _)|Es], E2) :-
+    acharElementosRegiaoColuna(Regiao, Es, E2).
+
+
+/*fazer função para ver se o número escolhido está ao lado de um número igual*/
+
+/*fazer função para ver se o número escolhido está ao lado de uma flecha, e verificar a direção da flecha e as regras*/
+
+
+
+completa(cell(0,_), _).
+completa(cell(Region,Value), Matrix) :-
+    acharQuantidadeElementosRegiao(Region, Matrix, QuantidadeElementosRegiao),
+    Value ins 1..QuantidadeElementosRegiao,
+    todosDiferentes([X1, X2, X3, X4]).
+
+
