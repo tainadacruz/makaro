@@ -246,28 +246,47 @@ acharElementosRegiaoColuna(Regiao, [cell(_, _)|Es], E2) :-
 
 
 /*fazer função para ver se o número escolhido está ao lado de um número igual*/
-naoHaIgualAoLadoCanto(cell(0, Value1), cell(_, Value2), cell(_, Value3)) :- true.
-naoHaIgualAoLadoCanto(cell(_, Value1), cell(0, Value2), cell(0, Value3)) :- true.
-naoHaIgualAoLadoCanto(cell(_, Value1), cell(0, Value2), cell(_, Value3)) :- not(member(value1, [Value3]))
-naoHaIgualAoLadoCanto(cell(_, Value1), cell(_, Value2), cell(0, Value3)) :- not(member(value1, [Value2]))
-naoHaIgualAoLadoCanto(cell(_, Value1), cell(_, Value2), cell(_, Value3)) :- not(member(Value1, [Value2, Value3])).
+naoHaIgualAoLadoCanto(cell(Region1, Value1), cell(Region2, Value2), cell(Region3, Value3)) :- member(Region1, [0]) ; 
+                                                                                              (not(member(Region1, [0])) ,
+                                                                                               ((member(Region2, [0]) ;
+                                                                                                (not(member(Region2, [0])) ,
+                                                                                                 not(member(Value1, [Value2])))) ,
+                                                                                                  (member(Region3, [0]) ;
+                                                                                                   (not(member(Region3, [0])) ,
+                                                                                                    not(member(Value1, [Value3])))))).
 
 
-naoHaIgualAoLadoLinha(cell(0, Value1), cell(_, Value2), cell(_, Value3), cell(_, Value4)) :- true.
-naoHaIgualAoLadoLinha(cell(_, Value1), cell(0, Value2), cell(0, Value3), cell(0, Value4)) :- true.
-naoHaIgualAoLadoLinha(cell(_, Value1), cell(0, Value2), cell(0, Value3), cell(_, Value4)) :- not(member(Value1, [Value4])).
-naoHaIgualAoLadoLinha(cell(_, Value1), cell(0, Value2), cell(_, Value3), cell(0, Value4)) :- not(member(Value1, [Value3])).
-naoHaIgualAoLadoLinha(cell(_, Value1), cell(_, Value2), cell(0, Value3), cell(0, Value4)) :- not(member(Value1, [Value2])).
+naoHaIgualAoLadoLinha(cell(Region1, Value1), cell(Region2, Value2), cell(Region3, Value3), cell(Region4, Value4)) :- 
+                                                                                              member(Region1, [0]) ; 
+                                                                                              (not(member(Region1, [0])) ,
+                                                                                               ((member(Region2, [0]) ;
+                                                                                                (not(member(Region2, [0])) ,
+                                                                                                 not(member(Value1, [Value2])))) ,
+                                                                                                  ((member(Region3, [0]) ;
+                                                                                                   (not(member(Region3, [0])) ,
+                                                                                                    not(member(Value1, [Value3])))),
+                                                                                                    (member(Region4, [0]) ;
+                                                                                                    (not(member(Region4, [0])) ,
+                                                                                                     not(member(Value1, [Value4]))))
+                                                                                                    ))).
 
 
-naoHaIgualAoLadoLinha(cell(_, Value1), cell(0, Value2), cell(_, Value3), cell(_, Value4)) :- not(member(Value1, [Value3, Value4])).
-naoHaIgualAoLadoLinha(cell(_, Value1), cell(_, Value2), cell(0, Value3), cell(_, Value4)) :- not(member(Value1, [Value2, Value4])).
-naoHaIgualAoLadoLinha(cell(_, Value1), cell(_, Value2), cell(_, Value3), cell(0, Value4)) :- not(member(Value1, [Value3, Value4])).
-naoHaIgualAoLadoLinha(cell(_, Value1), cell(_, Value2), cell(_, Value3), cell(_, Value4)) :- not(member(Value1, [Value2, Value3, Value4])).
-
-naoHaIgualAoLadoMeio(cell(_, Value1), cell(_, Value2), cell(_, Value3), cell(_, Value4), cell(_, Value5)) :- not(member(Value1, [Value2, Value3, Value4, Value5])).
-
-
+naoHaIgualAoLadoMeio(cell(Region1, Value1), cell(Region2, Value2), cell(Region3, Value3), cell(Region4, Value4), cell(Region5, Value5)) :- 
+                                                                                              member(Region1, [0]) ; 
+                                                                                              (not(member(Region1, [0])) ,
+                                                                                               ((member(Region2, [0]) ;
+                                                                                                (not(member(Region2, [0])) ,
+                                                                                                 not(member(Value1, [Value2])))) ,
+                                                                                                  ((member(Region3, [0]) ;
+                                                                                                   (not(member(Region3, [0])) ,
+                                                                                                    not(member(Value1, [Value3])))),
+                                                                                                    ((member(Region4, [0]) ;
+                                                                                                     (not(member(Region4, [0])) ,
+                                                                                                      not(member(Value1, [Value4])))),
+                                                                                                     (member(Region5, [0]) ;
+                                                                                                      (not(member(Region5, [0])) ,
+                                                                                                       not(member(Value1, [Value5])))))
+                                                                                                    ))).
 
 /*fazer função para ver se o número escolhido está ao lado de uma flecha, e verificar a direção da flecha e as regras*/
 
