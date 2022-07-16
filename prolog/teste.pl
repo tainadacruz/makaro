@@ -5,26 +5,20 @@ main:- makaro(2,Rows),solucao(Rows).
 
 
 makaro(2, M) :- 
-     M = [[cell(0,1),  cell(2,_),   cell(2,4),  cell(0,3),  cell(3,_),  cell(4,_),  cell(4,_),  cell(4,1)],
-          [cell(1,_),  cell(2,_),   cell(2,_),  cell(3,_),  cell(3,1),  cell(4,2),  cell(6,1),  cell(0,2)],
-          [cell(1,_),  cell(0,1),   cell(5,4),  cell(5,2),  cell(0,0),  cell(6,_),  cell(6,2),  cell(6,4)],
-          [cell(16,2), cell(16,_),  cell(0,4),  cell(5,_),  cell(5,3),  cell(9,_),  cell(0,1),  cell(6,5)],
-          [cell(0,1),  cell(7,_),   cell(7,_),  cell(8,_),  cell(8,_),  cell(9,_),  cell(9,_),  cell(10,_)],
-          [cell(17,_), cell(14,_),  cell(7,_),  cell(0,4),  cell(8,2),  cell(8,1),  cell(0,2),  cell(10,2)],
-          [cell(0,1),  cell(14,5),  cell(13,_), cell(13,2), cell(12,_), cell(0,1),  cell(10,3), cell(10,_)],
-          [cell(14,3), cell(14,_),  cell(14,4), cell(13,_), cell(12,_), cell(11,1), cell(11,_), cell(0,4)]].
+     M = [[cell(1,1,0,1),  cell(1,2,2,_),   cell(1,3,2,4),  cell(1,4,0,3),  cell(1,5,3,_),  cell(1,6,4,_),  cell(1,7,4,_),  cell(1,8,4,1)],
+          [cell(2,1,1,_),  cell(2,2,2,_),   cell(2,3,2,_),  cell(2,4,3,_),  cell(2,5,3,1),  cell(2,6,4,2),  cell(2,7,6,1),  cell(2,8,0,2)],
+          [cell(3,1,1,_),  cell(3,2,0,1),   cell(3,3,5,4),  cell(3,4,5,2),  cell(3,5,0,0),  cell(3,6,6,_),  cell(3,7,6,2),  cell(3,8,6,4)],
+          [cell(4,1,16,2), cell(4,2,16,_),  cell(4,3,0,4),  cell(4,4,5,_),  cell(4,5,5,3),  cell(4,6,9,_),  cell(4,7,0,1),  cell(4,8,6,5)],
+          [cell(5,1,0,1),  cell(5,2,7,_),   cell(5,3,7,_),  cell(5,4,8,_),  cell(5,5,8,_),  cell(5,6,9,_),  cell(5,7,9,_),  cell(5,8,10,_)],
+          [cell(6,1,17,_), cell(6,2,14,_),  cell(6,3,7,_),  cell(6,4,0,4),  cell(6,5,8,2),  cell(6,6,8,1),  cell(6,7,0,2),  cell(6,8,10,2)],
+          [cell(7,1,0,1),  cell(7,2,14,5),  cell(7,3,13,_), cell(7,4,13,2), cell(7,5,12,_), cell(7,6,0,1),  cell(7,7,10,3), cell(7,8,10,_)],
+          [cell(8,1,14,3), cell(8,2,14,_),  cell(8,3,14,4), cell(8,4,13,_), cell(8,5,12,_), cell(8,6,11,1), cell(8,7,11,_), cell(8,8,0,4)]].
 
 
 
 
 solucao(TabuleiroSolucao) :-
-	
 
-    naoHaIgualAoLadoCanto(cell(2,1), cell(2,2), cell(3,2)),
-    writeln('aqui').
-
-
-/*
     TabuleiroSolucao = tabuleiro[[X11, X12, X13, X14, X15, X16, X17, X18],
                                  [X21, X22, X23, X24, X25, X26, X27, X28],
                                  [X31, X32, X33, X34, X35, X36, X37, X38],
@@ -32,7 +26,8 @@ solucao(TabuleiroSolucao) :-
                                  [X51, X52, X53, X54, X55, X56, X57, X58],
                                  [X61, X62, X63, X64, X65, X66, X67, X68],
                                  [X71, X72, X73, X74, X75, X76, X77, X78],
-                                 [X81, X82, X83, X84, X85, X86, X87, X88]].
+                                 [X81, X82, X83, X84, X85, X86, X87, X88]
+                                ],
 
 
 
@@ -197,14 +192,26 @@ solucao(TabuleiroSolucao) :-
     naoHaIgualAoLadoMeio(X75, X65, X74, X76, X85),
     naoHaIgualAoLadoMeio(X76, X66, X75, X77, X86),
     naoHaIgualAoLadoMeio(X77, X67, X76, X78, X87),
-    
-*/
 
-completa(cell(0,_), _).
-completa(cell(Region,Value), Matrix) :-
-    acharQuantidadeElementosRegiao(Region, Matrix, QuantidadeElementosRegiao),
+
+    verificarFlechasMatriz([[X11, X12, X13, X14, X15, X16, X17, X18],
+                            [X21, X22, X23, X24, X25, X26, X27, X28],
+                            [X31, X32, X33, X34, X35, X36, X37, X38],
+                            [X41, X42, X43, X44, X45, X46, X47, X48],
+                            [X51, X52, X53, X54, X55, X56, X57, X58],
+                            [X61, X62, X63, X64, X65, X66, X67, X68],
+                            [X71, X72, X73, X74, X75, X76, X77, X78],
+                            [X81, X82, X83, X84, X85, X86, X87, X88]
+                           ]
+                          ).
+    
+
+
+completa(cell(_,_,0,_), _).
+completa(cell(_,_,Region,Value), Matriz) :-
+    acharQuantidadeElementosRegiao(Region, Matriz, QuantidadeElementosRegiao),
     Value ins 1..QuantidadeElementosRegiao,
-    naoHaIgualNaRegiao(Value, Region, Matrix).
+    naoHaIgualNaRegiao(Value, Region, Matriz).
 
 
 /*função para ver os números possíveis daquela célula, baseando-se no número de células da região da célula*/
@@ -221,15 +228,14 @@ acharQuantidadeElementosRegiaoColuna(Regiao, [E|Es], E2) :-
     acharQuantidadeElementosRegiaoColuna(Regiao, Es, RSs),
     E2 is E3 + RSs.
 
-acharQuantidadeElementosRegiaoCelula(ValorRegiao, cell(ValorRegiao, _), 1).
-acharQuantidadeElementosRegiaoCelula(_, cell(_, _), 0).
+acharQuantidadeElementosRegiaoCelula(ValorRegiao, cell(_,_,ValorRegiao, _), 1).
+acharQuantidadeElementosRegiaoCelula(_, cell(_,_,_,_), 0).
 
 
 /*terminar função para ver se o número escolhido já não pertence à região daquela célula*/
 
-naoHaIgualNaRegiao([]).
-naoHaIgualNaRegiao(Value, Regiao, Matrix) :- 
-    acharElementosRegiao(Regiao, Matrix, ElementosRegiao),    
+naoHaIgualNaRegiao(Value, Regiao, Matriz) :- 
+    acharElementosRegiao(Regiao, Matriz, ElementosRegiao),    
     not(member(Value,ElementosRegiao)).
 
 acharElementosRegiao(_, [], []).
@@ -239,14 +245,14 @@ acharElementosRegiao(Regiao, [L|Ls], E) :-
     append(RSs, E1, E).
 
 acharElementosRegiaoColuna(_, [], []).
-acharElementosRegiaoColuna(Regiao, [cell(Regiao, Elemento)|Es], [Elemento|E2]) :-
+acharElementosRegiaoColuna(Regiao, [cell(_,_,Regiao,Elemento)|Es], [Elemento|E2]) :-
     acharElementosRegiaoColuna(Regiao, Es, E2).
-acharElementosRegiaoColuna(Regiao, [cell(_, _)|Es], E2) :-
+acharElementosRegiaoColuna(Regiao, [cell(_,_,_,_)|Es], E2) :-
     acharElementosRegiaoColuna(Regiao, Es, E2).
 
 
 /*fazer função para ver se o número escolhido está ao lado de um número igual*/
-naoHaIgualAoLadoCanto(cell(Region1, Value1), cell(Region2, Value2), cell(Region3, Value3)) :- member(Region1, [0]) ; 
+naoHaIgualAoLadoCanto(cell(_,_,Region1, Value1), cell(_,_,Region2, Value2), cell(_,_,Region3, Value3)) :- member(Region1, [0]) ; 
                                                                                               (not(member(Region1, [0])) ,
                                                                                                ((member(Region2, [0]) ;
                                                                                                 (not(member(Region2, [0])) ,
@@ -256,7 +262,7 @@ naoHaIgualAoLadoCanto(cell(Region1, Value1), cell(Region2, Value2), cell(Region3
                                                                                                     not(member(Value1, [Value3])))))).
 
 
-naoHaIgualAoLadoLinha(cell(Region1, Value1), cell(Region2, Value2), cell(Region3, Value3), cell(Region4, Value4)) :- 
+naoHaIgualAoLadoLinha(cell(_,_,Region1, Value1), cell(_,_,Region2, Value2), cell(_,_,Region3, Value3), cell(_,_,Region4, Value4)) :- 
                                                                                               member(Region1, [0]) ; 
                                                                                               (not(member(Region1, [0])) ,
                                                                                                ((member(Region2, [0]) ;
@@ -271,7 +277,7 @@ naoHaIgualAoLadoLinha(cell(Region1, Value1), cell(Region2, Value2), cell(Region3
                                                                                                     ))).
 
 
-naoHaIgualAoLadoMeio(cell(Region1, Value1), cell(Region2, Value2), cell(Region3, Value3), cell(Region4, Value4), cell(Region5, Value5)) :- 
+naoHaIgualAoLadoMeio(cell(_,_,Region1, Value1), cell(_,_,Region2, Value2), cell(_,_,Region3, Value3), cell(_,_,Region4, Value4), cell(_,_,Region5, Value5)) :- 
                                                                                               member(Region1, [0]) ; 
                                                                                               (not(member(Region1, [0])) ,
                                                                                                ((member(Region2, [0]) ;
@@ -288,6 +294,55 @@ naoHaIgualAoLadoMeio(cell(Region1, Value1), cell(Region2, Value2), cell(Region3,
                                                                                                        not(member(Value1, [Value5])))))
                                                                                                     ))).
 
-/*fazer função para ver se o número escolhido está ao lado de uma flecha, e verificar a direção da flecha e as regras*/
+/*fazer função para ver se o número escolhido é uma flecha, e verificar a direção da flecha e as regras*/
+
+/*
+Arrow: 1 - direita, 2 - baixo, 3 - esquerda, 4 - cima
+*/
+
+verificarFlechasMatriz([L|Ls]) :- 
+    verificarFlechasMatrizCelula(L, [L|Ls]),
+    verificarFlechasMatriz(Ls, [L|Ls]).
+
+verificarFlechasMatrizCelula([C|Cs], Matriz)
+    verificarAdjacenciasFlecha(C, Matriz),
+    verificarFlechasMatrizCelula(Cs, Matriz).
 
 
+verificarAdjacenciasFlecha(cell(Linha,Coluna,Regiao,Value), Matriz) :- 
+    not(member(Regiao,[0]));
+    (member(Regiao,[0]), verificarDirecaoFlecha(Linha, Coluna, Value, Matriz, length(Matriz))).
+
+verificarDirecaoFlecha(_,_,0,Matriz).
+verificarDirecaoFlecha(Linha,Coluna,1,Matriz,Tamanho) :- verificarValorDirecaoMatriz(Linha, (Coluna+1), Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
+verificarDirecaoFlecha(Linha,Coluna,2,Matriz,Tamanho) :- verificarValorDirecaoMatriz((Linha+1), Coluna, Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
+verificarDirecaoFlecha(Linha,Coluna,3,Matriz,Tamanho) :- verificarValorDirecaoMatriz(Linha, (Coluna-1), Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
+verificarDirecaoFlecha(Linha,Coluna,4,Matriz,Tamanho) :- verificarValorDirecaoMatriz((Linha-1), Coluna, Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
+
+verificarValorDirecaoMatriz(_,_,_,[]).
+verificarValorDirecaoMatriz(Linha, Coluna, Matriz, NumeroElementoDirecao) :-
+    nth0((Linha-1), Matriz, LinhaElemento),
+    nth0((Coluna-1), Matriz, Elemento),
+    verificarValorDirecaoCelula(Elemento, NumeroElementoDirecao).
+
+verificarValorDirecaoCelula(cell(_,_,_,Valor), Valor).
+
+
+verificarAdjacenciasFlecha(1,       1,       Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((1+1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (1+1), Matriz, Valor).
+verificarAdjacenciasFlecha(1,       Tamanho, Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((1+1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (Tamanho-1), Matriz, Valor).
+verificarAdjacenciasFlecha(Tamanho, 1,       Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((Tamanho-1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (1+1), Matriz, Valor).
+verificarAdjacenciasFlecha(Tamanho, Tamanho, Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((Tamanho-1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (Tamanho-1), Matriz, Valor).
+verificarAdjacenciasFlecha(1,       Coluna,  Matriz,Valor,Tamanho) :- Coluna < Tamanho, verificarAdjacenciasFlechaCelula((1+1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (Coluna-1), Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (Coluna+1), Matriz, Valor).
+verificarAdjacenciasFlecha(Tamanho, Coluna,  Matriz,Valor,Tamanho) :- Coluna < Tamanho, verificarAdjacenciasFlechaCelula((Tamanho-1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (Coluna-1), Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (Coluna+1), Matriz, Valor).
+verificarAdjacenciasFlecha(Linha,   1,       Matriz,Valor,Tamanho) :- Linha < Tamanho, verificarAdjacenciasFlechaCelula(Linha, (1+1), Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha-1), 1, Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha+1), 1, Matriz, Valor).
+verificarAdjacenciasFlecha(Linha,   Tamanho, Matriz,Valor,Tamanho) :- Linha < Tamanho, verificarAdjacenciasFlechaCelula(Linha, (Tamanho-1), Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha-1), Tamanho, Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha+1), Tamanho, Matriz, Valor).
+verificarAdjacenciasFlecha(Linha,   Coluna,  Matriz,Valor,Tamanho) :- Linha < Tamanho, Coluna < Tamanho, verificarAdjacenciasFlechaCelula(Linha, (Coluna+1), Matriz, Valor), verificarAdjacenciasFlechaCelula(Linha, (Coluna-1), Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha+1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha-1), Coluna, Matriz, Valor).
+
+
+verificarAdjacenciasFlechaCelula(Linha, Coluna, Matriz, Valor) :-
+    nth0((Linha-1), Matriz, LinhaElemento),
+    nth0((Coluna-1), Matriz, Elemento),
+    verificarAdjacenciasFlechaElemento(Elemento, ValorElemento),
+    ValorElemento < Valor.
+
+verificarAdjacenciasFlechaElemento(cell(_,_,_,ValorElemento), ValorElemento).
