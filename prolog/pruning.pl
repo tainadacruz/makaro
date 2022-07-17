@@ -4,10 +4,13 @@
 /*função que completa o número na célula*/
 
 completa(cell(_,_,0,_), _).
-completa(cell(_,_,Region,Value), Matriz) :-
+completa(cell(Linha,Coluna,Region,Value), Matriz) :-
     acharQuantidadeElementosRegiao(Region, Matriz, QuantidadeElementosRegiao),
-    Value in 1..QuantidadeElementosRegiao,
-    naoHaIgualNaRegiao(Value, Region, Matriz).
+    my_in(Value, 1, QuantidadeElementosRegiao),
+    naoHaIgualNaRegiao(Linha,Coluna,Value, Region, Matriz).
+
+my_in(Value, Maior, Maior) :- Value is Maior.
+my_in(Value, Menor, Maior) :- Value is Menor ; my_in(Value, (Menor+1), Maior).
 
 
 /*função para ver os números possíveis daquela célula, baseando-se no número de células da região da célula*/
@@ -28,20 +31,24 @@ acharQuantidadeElementosRegiaoCelula(ValorRegiao, cell(_,_,ValorRegiao, _), 1).
 acharQuantidadeElementosRegiaoCelula(_, cell(_,_,_,_), 0).
 
 
-/*terminar função para ver se o número escolhido já não pertence à região daquela célula*/
+/*função para ver se o número escolhido já não pertence à região daquela célula*/
 
-naoHaIgualNaRegiao(Value, Regiao, Matriz) :- 
-    acharElementosRegiao(Regiao, Matriz, ElementosRegiao),    
+naoHaIgualNaRegiao(Linha, Coluna, Value, Regiao, Matriz) :- 
+    acharElementosRegiao(Linha, Coluna, Regiao, Matriz, ElementosRegiao),    
     not(member(Value,ElementosRegiao)).
 
-acharElementosRegiao(_, [], []).
-acharElementosRegiao(Regiao, [L|Ls], E) :-
-    acharElementosRegiaoColuna(Regiao, L, RSs),
-    acharElementosRegiao(Regiao, Ls, E1),
+acharElementosRegiao(_, _, _, [], []).
+acharElementosRegiao(Linha, Coluna, Regiao, [L|Ls], E) :-
+    acharElementosRegiaoColuna(Linha, Coluna, Regiao, L, RSs),
+    acharElementosRegiao(Linha, Coluna, Regiao, Ls, E1),
     append(RSs, E1, E).
 
-acharElementosRegiaoColuna(_, [], []).
-acharElementosRegiaoColuna(Regiao, [cell(_,_,Regiao,Elemento)|Es], [Elemento|E2]) :-
-    acharElementosRegiaoColuna(Regiao, Es, E2).
-acharElementosRegiaoColuna(Regiao, [cell(_,_,_,_)|Es], E2) :-
-    acharElementosRegiaoColuna(Regiao, Es, E2).
+acharElementosRegiaoColuna(_,_,_, [], []).
+acharElementosRegiaoColuna(Linha, Coluna, Regiao, [cell(Linha,Coluna,Regiao,_)|Es], E2) :-
+    acharElementosRegiaoColuna(Linha, Coluna, Regiao, Es, E2).
+acharElementosRegiaoColuna(Linha, Coluna, Regiao, [cell(_,_,Regiao,Elemento)|Es], [Elemento|E2]) :-
+    not(var(Elemento)), acharElementosRegiaoColuna(Linha, Coluna, Regiao, Es, E2).
+acharElementosRegiaoColuna(Linha, Coluna, Regiao, [cell(_,_,Regiao,Elemento)|Es], E2) :-
+    var(Elemento), acharElementosRegiaoColuna(Linha, Coluna, Regiao, Es, E2).
+acharElementosRegiaoColuna(Linha, Coluna, Regiao, [cell(_,_,RegiaoCelula,_)|Es], E2) :-
+    not(member(RegiaoCelula, [Regiao])), acharElementosRegiaoColuna(Linha, Coluna, Regiao, Es, E2).
