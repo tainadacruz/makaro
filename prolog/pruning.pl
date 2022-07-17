@@ -6,8 +6,7 @@
 completa(cell(_,_,0,_), _).
 completa(cell(_,_,Region,Value), Matriz) :-
     acharQuantidadeElementosRegiao(Region, Matriz, QuantidadeElementosRegiao),
-    Quantidade is QuantidadeElementosRegiao,
-    Value ins Quantidade,
+    Value in 1..QuantidadeElementosRegiao,
     naoHaIgualNaRegiao(Value, Region, Matriz).
 
 
