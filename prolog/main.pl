@@ -4,6 +4,7 @@
 :- consult('pruning.pl').
 :- consult('adjacency.pl').
 :- consult('arrow_verification.pl').
+:- consult('possibilities.pl').
 
 main:- makaro(2,Rows),solucao(Rows).
 
@@ -130,3 +131,4 @@ verifica(Linha,Coluna,Value,Region,Matriz) :-
 
 my_in(Value, Maior, Maior) :- Value is Maior.
 my_in(Value, Menor, Maior) :- Value is Menor ; my_in(Value, (Menor+1), Maior).
+ 
