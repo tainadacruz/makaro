@@ -15,7 +15,7 @@ verificarFlechasMatrizCelula([C|Cs], Matriz) :-
 
 verificarAdjacenciasFlecha(cell(Linha,Coluna,Regiao,Value), Matriz) :- 
     not(member(Regiao,[0]));
-    (member(Regiao,[0]), verificarDirecaoFlecha(Linha, Coluna, Value, Matriz, length(Matriz))).
+    (member(Regiao,[0]), length(Matriz, Tamanho), verificarDirecaoFlecha(Linha, Coluna, Value, Matriz, Tamanho)).
 
 verificarDirecaoFlecha(_,_,0,_).
 verificarDirecaoFlecha(Linha,Coluna,1,Matriz,Tamanho) :- NovoValor is Coluna+1, verificarValorDirecaoMatriz(Linha, NovoValor, Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
@@ -47,27 +47,27 @@ verificarAdjacenciasFlecha(Tamanho, Tamanho, Matriz,Valor,Tamanho) :- VerificarA
     verificarAdjacenciasFlechaCelula(VerificarAcima, Tamanho, Matriz, Valor), 
     verificarAdjacenciasFlechaCelula(Tamanho, VerificarEsquerda, Matriz, Valor).
 
-verificarAdjacenciasFlecha(1,       Coluna,  Matriz,Valor,Tamanho) :- Coluna < Tamanho, VerificarAbaixo is 1+1, VerificarEsquerda is Coluna-1, VerificarDireita is Coluna+1,
+verificarAdjacenciasFlecha(1,       Coluna,  Matriz,Valor,Tamanho) :- Coluna =\= 1, Coluna < Tamanho, VerificarAbaixo is 1+1, VerificarEsquerda is Coluna-1, VerificarDireita is Coluna+1,
     verificarAdjacenciasFlechaCelula(VerificarAbaixo, Coluna, Matriz, Valor), 
     verificarAdjacenciasFlechaCelula(1, VerificarEsquerda, Matriz, Valor), 
     verificarAdjacenciasFlechaCelula(1, VerificarDireita, Matriz, Valor).
 
-verificarAdjacenciasFlecha(Tamanho, Coluna,  Matriz,Valor,Tamanho) :- Coluna < Tamanho, VerificarAcima is Tamanho-1, VerificarEsquerda is Coluna-1, VerificarDireita is Coluna+1,
+verificarAdjacenciasFlecha(Tamanho, Coluna,  Matriz,Valor,Tamanho) :- Coluna =\= 1, Coluna < Tamanho, VerificarAcima is Tamanho-1, VerificarEsquerda is Coluna-1, VerificarDireita is Coluna+1,
     verificarAdjacenciasFlechaCelula(VerificarAcima, Coluna, Matriz, Valor), 
     verificarAdjacenciasFlechaCelula(Tamanho, VerificarEsquerda, Matriz, Valor), 
     verificarAdjacenciasFlechaCelula(Tamanho, VerificarDireita, Matriz, Valor).
 
-verificarAdjacenciasFlecha(Linha,   1,       Matriz,Valor,Tamanho) :- Linha < Tamanho, VerificarDireita is 1+1, VerificarAcima is Linha-1, VerificarAbaixo is Linha+1, 
+verificarAdjacenciasFlecha(Linha,   1,       Matriz,Valor,Tamanho) :- Linha =\= 1, Linha < Tamanho, VerificarDireita is 1+1, VerificarAcima is Linha-1, VerificarAbaixo is Linha+1, 
     verificarAdjacenciasFlechaCelula(Linha, VerificarDireita, Matriz, Valor), 
     verificarAdjacenciasFlechaCelula(VerificarAcima, 1, Matriz, Valor), 
     verificarAdjacenciasFlechaCelula(VerificarAbaixo, 1, Matriz, Valor).
 
-verificarAdjacenciasFlecha(Linha,   Tamanho, Matriz,Valor,Tamanho) :- Linha < Tamanho, VerificarEsquerda is Tamanho-1, VerificarAcima is Linha-1, VerificarAbaixo is Linha+1,
+verificarAdjacenciasFlecha(Linha,   Tamanho, Matriz,Valor,Tamanho) :- Linha =\= 1, Linha < Tamanho, VerificarEsquerda is Tamanho-1, VerificarAcima is Linha-1, VerificarAbaixo is Linha+1,
     verificarAdjacenciasFlechaCelula(Linha, VerificarEsquerda, Matriz, Valor), 
     verificarAdjacenciasFlechaCelula(VerificarAcima, Tamanho, Matriz, Valor), 
-    verificarAdjacenciasFlechaCelula(VerificarAbaixo), Tamanho, Matriz, Valor).
+    verificarAdjacenciasFlechaCelula(VerificarAbaixo, Tamanho, Matriz, Valor).
 
-verificarAdjacenciasFlecha(Linha,   Coluna,  Matriz,Valor,Tamanho) :- Linha < Tamanho, Coluna < Tamanho, VerificarDireita is Coluna+1, VerificarEsquerda is Coluna-1, VerificarAbaixo is Linha+1, VerificarAcima is Linha-1,
+verificarAdjacenciasFlecha(Linha,   Coluna,  Matriz,Valor,Tamanho) :- Linha =\= 1, Coluna =\= 1, Linha < Tamanho, Coluna < Tamanho, VerificarDireita is Coluna+1, VerificarEsquerda is Coluna-1, VerificarAbaixo is Linha+1, VerificarAcima is Linha-1,
     verificarAdjacenciasFlechaCelula(Linha, VerificarDireita, Matriz, Valor), 
     verificarAdjacenciasFlechaCelula(Linha, VerificarEsquerda, Matriz, Valor), 
     verificarAdjacenciasFlechaCelula(VerificarAbaixo, Coluna, Matriz, Valor), 
