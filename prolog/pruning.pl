@@ -6,11 +6,9 @@
 completa(cell(_,_,0,_), _).
 completa(cell(_,_,Region,Value), Matriz) :-
     acharQuantidadeElementosRegiao(Region, Matriz, QuantidadeElementosRegiao),
-    my_in(Value, 1, QuantidadeElementosRegiao),
+    Quantidade is QuantidadeElementosRegiao,
+    Value ins Quantidade,
     naoHaIgualNaRegiao(Value, Region, Matriz).
-
-my_in(Var, Lower, Upper) :-
-        Lower #=< Var, Var #=< Upper.
 
 
 /*função para ver os números possíveis daquela célula, baseando-se no número de células da região da célula*/
