@@ -219,8 +219,11 @@ solucao(TabuleiroSolucao) :-
 completa(cell(_,_,0,_), _).
 completa(cell(_,_,Region,Value), Matriz) :-
     acharQuantidadeElementosRegiao(Region, Matriz, QuantidadeElementosRegiao),
-    Value ins 1..QuantidadeElementosRegiao,
+    my_in(Value, 1, QuantidadeElementosRegiao),
     naoHaIgualNaRegiao(Value, Region, Matriz).
+
+my_in(Var, Lower, Upper) :-
+        Lower #=< Var, Var #=< Upper.
 
 
 /*função para ver os números possíveis daquela célula, baseando-se no número de células da região da célula*/
