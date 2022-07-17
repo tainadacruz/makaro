@@ -129,7 +129,7 @@ naoHaIgualAoLadoLinha(cell(_,_,Region1, Value1), cell(_,_,Region2, Value2), cell
 naoHaIgualAoLadoMeio(cell(_,_,Region1, Value1), cell(_,_,Region2, Value2), cell(_,_,Region3, Value3), cell(_,_,Region4, Value4), cell(_,_,Region5, Value5)) :- 
                                                                                               member(Region1, [0]) ; 
                                                                                               (not(member(Region1, [0])) ,
-                                                                                                  (var(Value1) ,
+                                                                                                  (var(Value1) ;
                                                                                                    ((member(Region2, [0]) ;
                                                                                                     (not(member(Region2, [0])) ,
                                                                                                         (var(Value2) ;
