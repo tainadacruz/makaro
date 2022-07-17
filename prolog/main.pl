@@ -124,10 +124,9 @@ completa(cell(Linha,Coluna,Region,Value), Matriz) :-
     verifica(Linha,Coluna,Value, Region, Matriz).
 
 verifica(Linha,Coluna,Value,Region,Matriz) :-
-    (member(Value,[0]) ,
     naoHaIgualNaRegiao(Linha,Coluna,Value, Region, Matriz),
     verificarAdjacencias(Matriz),
-    verificarFlechasMatriz(Matriz, Matriz)).
+    verificarFlechasMatriz(Matriz, Matriz).
 
 my_in(Value, Maior, Maior) :- Value is Maior.
 my_in(Value, Menor, Maior) :- Value is Menor ; my_in(Value, (Menor+1), Maior).
