@@ -19,7 +19,7 @@ acharQuantidadeElementosRegiaoCelula(ValorRegiao, cell(_,_,ValorRegiao, _), 1).
 acharQuantidadeElementosRegiaoCelula(_, cell(_,_,_,_), 0).
 
 
-/*função para ver se o número escolhido já não pertence à região daquela célula*/
+/*terminar função para ver se o número escolhido já não pertence à região daquela célula*/
 
 naoHaIgualNaRegiao(Linha, Coluna, Value, Regiao, Matriz) :- 
     acharElementosRegiao(Linha, Coluna, Regiao, Matriz, ElementosRegiao),    

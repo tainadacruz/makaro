@@ -1,3 +1,6 @@
+:- use_module(library(clpfd)).
+:- use_module(library(lists)).
+
 /*fazer função para ver se o número escolhido está ao lado de um número igual*/
 verificarAdjacencias(TabuleiroSolucao) :-
     
