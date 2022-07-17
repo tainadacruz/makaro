@@ -1,18 +1,6 @@
 :- use_module(library(clpfd)).
 :- use_module(library(lists)).
 
-/*função que completa o número na célula*/
-
-completa(cell(_,_,0,_), _).
-completa(cell(Linha,Coluna,Region,Value), Matriz) :-
-    acharQuantidadeElementosRegiao(Region, Matriz, QuantidadeElementosRegiao),
-    my_in(Value, 1, QuantidadeElementosRegiao),
-    naoHaIgualNaRegiao(Linha,Coluna,Value, Region, Matriz).
-
-my_in(Value, Maior, Maior) :- Value is Maior.
-my_in(Value, Menor, Maior) :- Value is Menor ; my_in(Value, (Menor+1), Maior).
-
-
 /*função para ver os números possíveis daquela célula, baseando-se no número de células da região da célula*/
 
 acharQuantidadeElementosRegiao(_, [], 0).
