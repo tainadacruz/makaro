@@ -19,15 +19,15 @@ makaro(2, M) :-
 
 solucao(TabuleiroSolucao) :-
 
-    TabuleiroSolucao = tabuleiro[[X11, X12, X13, X14, X15, X16, X17, X18],
-                                 [X21, X22, X23, X24, X25, X26, X27, X28],
-                                 [X31, X32, X33, X34, X35, X36, X37, X38],
-                                 [X41, X42, X43, X44, X45, X46, X47, X48],
-                                 [X51, X52, X53, X54, X55, X56, X57, X58],
-                                 [X61, X62, X63, X64, X65, X66, X67, X68],
-                                 [X71, X72, X73, X74, X75, X76, X77, X78],
-                                 [X81, X82, X83, X84, X85, X86, X87, X88]
-                                ],
+    TabuleiroSolucao = [[X11, X12, X13, X14, X15, X16, X17, X18],
+                        [X21, X22, X23, X24, X25, X26, X27, X28],
+                        [X31, X32, X33, X34, X35, X36, X37, X38],
+                        [X41, X42, X43, X44, X45, X46, X47, X48],
+                        [X51, X52, X53, X54, X55, X56, X57, X58],
+                        [X61, X62, X63, X64, X65, X66, X67, X68],
+                        [X71, X72, X73, X74, X75, X76, X77, X78],
+                        [X81, X82, X83, X84, X85, X86, X87, X88]
+                       ],
 
 
 
@@ -202,6 +202,15 @@ solucao(TabuleiroSolucao) :-
                             [X61, X62, X63, X64, X65, X66, X67, X68],
                             [X71, X72, X73, X74, X75, X76, X77, X78],
                             [X81, X82, X83, X84, X85, X86, X87, X88]
+                           ],
+                           [[X11, X12, X13, X14, X15, X16, X17, X18],
+                            [X21, X22, X23, X24, X25, X26, X27, X28],
+                            [X31, X32, X33, X34, X35, X36, X37, X38],
+                            [X41, X42, X43, X44, X45, X46, X47, X48],
+                            [X51, X52, X53, X54, X55, X56, X57, X58],
+                            [X61, X62, X63, X64, X65, X66, X67, X68],
+                            [X71, X72, X73, X74, X75, X76, X77, X78],
+                            [X81, X82, X83, X84, X85, X86, X87, X88]
                            ]
                           ).
     
@@ -300,11 +309,11 @@ naoHaIgualAoLadoMeio(cell(_,_,Region1, Value1), cell(_,_,Region2, Value2), cell(
 Arrow: 1 - direita, 2 - baixo, 3 - esquerda, 4 - cima
 */
 
-verificarFlechasMatriz([L|Ls]) :- 
-    verificarFlechasMatrizCelula(L, [L|Ls]),
-    verificarFlechasMatriz(Ls, [L|Ls]).
+verificarFlechasMatriz([L|Ls], Matriz) :- 
+    verificarFlechasMatrizCelula(L, Matriz),
+    verificarFlechasMatriz(Ls, Matriz).
 
-verificarFlechasMatrizCelula([C|Cs], Matriz)
+verificarFlechasMatrizCelula([C|Cs], Matriz) :-
     verificarAdjacenciasFlecha(C, Matriz),
     verificarFlechasMatrizCelula(Cs, Matriz).
 
@@ -313,7 +322,7 @@ verificarAdjacenciasFlecha(cell(Linha,Coluna,Regiao,Value), Matriz) :-
     not(member(Regiao,[0]));
     (member(Regiao,[0]), verificarDirecaoFlecha(Linha, Coluna, Value, Matriz, length(Matriz))).
 
-verificarDirecaoFlecha(_,_,0,Matriz).
+verificarDirecaoFlecha(_,_,0,_).
 verificarDirecaoFlecha(Linha,Coluna,1,Matriz,Tamanho) :- verificarValorDirecaoMatriz(Linha, (Coluna+1), Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
 verificarDirecaoFlecha(Linha,Coluna,2,Matriz,Tamanho) :- verificarValorDirecaoMatriz((Linha+1), Coluna, Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
 verificarDirecaoFlecha(Linha,Coluna,3,Matriz,Tamanho) :- verificarValorDirecaoMatriz(Linha, (Coluna-1), Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
@@ -322,16 +331,16 @@ verificarDirecaoFlecha(Linha,Coluna,4,Matriz,Tamanho) :- verificarValorDirecaoMa
 verificarValorDirecaoMatriz(_,_,_,[]).
 verificarValorDirecaoMatriz(Linha, Coluna, Matriz, NumeroElementoDirecao) :-
     nth0((Linha-1), Matriz, LinhaElemento),
-    nth0((Coluna-1), Matriz, Elemento),
+    nth0((Coluna-1), LinhaElemento, Elemento),
     verificarValorDirecaoCelula(Elemento, NumeroElementoDirecao).
 
 verificarValorDirecaoCelula(cell(_,_,_,Valor), Valor).
 
 
-verificarAdjacenciasFlecha(1,       1,       Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((1+1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (1+1), Matriz, Valor).
-verificarAdjacenciasFlecha(1,       Tamanho, Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((1+1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (Tamanho-1), Matriz, Valor).
-verificarAdjacenciasFlecha(Tamanho, 1,       Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((Tamanho-1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (1+1), Matriz, Valor).
-verificarAdjacenciasFlecha(Tamanho, Tamanho, Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((Tamanho-1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (Tamanho-1), Matriz, Valor).
+verificarAdjacenciasFlecha(1,       1,       Matriz,Valor,_) :- verificarAdjacenciasFlechaCelula((1+1), 1, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (1+1), Matriz, Valor).
+verificarAdjacenciasFlecha(1,       Tamanho, Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((1+1), Tamanho, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (Tamanho-1), Matriz, Valor).
+verificarAdjacenciasFlecha(Tamanho, 1,       Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((Tamanho-1), 1, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (1+1), Matriz, Valor).
+verificarAdjacenciasFlecha(Tamanho, Tamanho, Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((Tamanho-1), Tamanho, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (Tamanho-1), Matriz, Valor).
 verificarAdjacenciasFlecha(1,       Coluna,  Matriz,Valor,Tamanho) :- Coluna < Tamanho, verificarAdjacenciasFlechaCelula((1+1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (Coluna-1), Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (Coluna+1), Matriz, Valor).
 verificarAdjacenciasFlecha(Tamanho, Coluna,  Matriz,Valor,Tamanho) :- Coluna < Tamanho, verificarAdjacenciasFlechaCelula((Tamanho-1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (Coluna-1), Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (Coluna+1), Matriz, Valor).
 verificarAdjacenciasFlecha(Linha,   1,       Matriz,Valor,Tamanho) :- Linha < Tamanho, verificarAdjacenciasFlechaCelula(Linha, (1+1), Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha-1), 1, Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha+1), 1, Matriz, Valor).
@@ -341,7 +350,7 @@ verificarAdjacenciasFlecha(Linha,   Coluna,  Matriz,Valor,Tamanho) :- Linha < Ta
 
 verificarAdjacenciasFlechaCelula(Linha, Coluna, Matriz, Valor) :-
     nth0((Linha-1), Matriz, LinhaElemento),
-    nth0((Coluna-1), Matriz, Elemento),
+    nth0((Coluna-1), LinhaElemento, Elemento),
     verificarAdjacenciasFlechaElemento(Elemento, ValorElemento),
     ValorElemento < Valor.
 
