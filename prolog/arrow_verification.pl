@@ -1,4 +1,4 @@
-/*fazer função para ver se o número escolhido é uma flecha, e verificar a direção da flecha e as regras*/
+/*função para ver se o número escolhido é uma flecha, e verificar a direção da flecha e as regras*/
 
 /*
 Arrow: 1 - direita, 2 - baixo, 3 - esquerda, 4 - cima
@@ -18,34 +18,65 @@ verificarAdjacenciasFlecha(cell(Linha,Coluna,Regiao,Value), Matriz) :-
     (member(Regiao,[0]), verificarDirecaoFlecha(Linha, Coluna, Value, Matriz, length(Matriz))).
 
 verificarDirecaoFlecha(_,_,0,_).
-verificarDirecaoFlecha(Linha,Coluna,1,Matriz,Tamanho) :- verificarValorDirecaoMatriz(Linha, (Coluna+1), Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
-verificarDirecaoFlecha(Linha,Coluna,2,Matriz,Tamanho) :- verificarValorDirecaoMatriz((Linha+1), Coluna, Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
-verificarDirecaoFlecha(Linha,Coluna,3,Matriz,Tamanho) :- verificarValorDirecaoMatriz(Linha, (Coluna-1), Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
-verificarDirecaoFlecha(Linha,Coluna,4,Matriz,Tamanho) :- verificarValorDirecaoMatriz((Linha-1), Coluna, Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
+verificarDirecaoFlecha(Linha,Coluna,1,Matriz,Tamanho) :- NovoValor is Coluna+1, verificarValorDirecaoMatriz(Linha, NovoValor, Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
+verificarDirecaoFlecha(Linha,Coluna,2,Matriz,Tamanho) :- NovoValor is Linha+1, verificarValorDirecaoMatriz(NovoValor, Coluna, Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
+verificarDirecaoFlecha(Linha,Coluna,3,Matriz,Tamanho) :- NovoValor is Coluna-1, verificarValorDirecaoMatriz(Linha, NovoValor, Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
+verificarDirecaoFlecha(Linha,Coluna,4,Matriz,Tamanho) :- NovoValor is Linha-1, verificarValorDirecaoMatriz(NovoValor, Coluna, Matriz, NumeroElementoDirecao), verificarAdjacenciasFlecha(Linha, Coluna, Matriz, NumeroElementoDirecao, Tamanho).
 
-verificarValorDirecaoMatriz(_,_,_,[]).
 verificarValorDirecaoMatriz(Linha, Coluna, Matriz, NumeroElementoDirecao) :-
-    nth0((Linha-1), Matriz, LinhaElemento),
-    nth0((Coluna-1), LinhaElemento, Elemento),
+    NovoValorLinha is Linha-1, nth0(NovoValorLinha, Matriz, LinhaElemento),
+    NovoValorColuna is Coluna-1, nth0(NovoValorColuna, LinhaElemento, Elemento),
     verificarValorDirecaoCelula(Elemento, NumeroElementoDirecao).
 
 verificarValorDirecaoCelula(cell(_,_,_,Valor), Valor).
 
 
-verificarAdjacenciasFlecha(1,       1,       Matriz,Valor,_) :- verificarAdjacenciasFlechaCelula((1+1), 1, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (1+1), Matriz, Valor).
-verificarAdjacenciasFlecha(1,       Tamanho, Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((1+1), Tamanho, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (Tamanho-1), Matriz, Valor).
-verificarAdjacenciasFlecha(Tamanho, 1,       Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((Tamanho-1), 1, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (1+1), Matriz, Valor).
-verificarAdjacenciasFlecha(Tamanho, Tamanho, Matriz,Valor,Tamanho) :- verificarAdjacenciasFlechaCelula((Tamanho-1), Tamanho, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (Tamanho-1), Matriz, Valor).
-verificarAdjacenciasFlecha(1,       Coluna,  Matriz,Valor,Tamanho) :- Coluna < Tamanho, verificarAdjacenciasFlechaCelula((1+1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (Coluna-1), Matriz, Valor), verificarAdjacenciasFlechaCelula(1, (Coluna+1), Matriz, Valor).
-verificarAdjacenciasFlecha(Tamanho, Coluna,  Matriz,Valor,Tamanho) :- Coluna < Tamanho, verificarAdjacenciasFlechaCelula((Tamanho-1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (Coluna-1), Matriz, Valor), verificarAdjacenciasFlechaCelula(Tamanho, (Coluna+1), Matriz, Valor).
-verificarAdjacenciasFlecha(Linha,   1,       Matriz,Valor,Tamanho) :- Linha < Tamanho, verificarAdjacenciasFlechaCelula(Linha, (1+1), Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha-1), 1, Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha+1), 1, Matriz, Valor).
-verificarAdjacenciasFlecha(Linha,   Tamanho, Matriz,Valor,Tamanho) :- Linha < Tamanho, verificarAdjacenciasFlechaCelula(Linha, (Tamanho-1), Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha-1), Tamanho, Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha+1), Tamanho, Matriz, Valor).
-verificarAdjacenciasFlecha(Linha,   Coluna,  Matriz,Valor,Tamanho) :- Linha < Tamanho, Coluna < Tamanho, verificarAdjacenciasFlechaCelula(Linha, (Coluna+1), Matriz, Valor), verificarAdjacenciasFlechaCelula(Linha, (Coluna-1), Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha+1), Coluna, Matriz, Valor), verificarAdjacenciasFlechaCelula((Linha-1), Coluna, Matriz, Valor).
+verificarAdjacenciasFlecha(1,       1,       Matriz,Valor,_) :- VerificarAbaixo is 1+1, VerificarDireita is 1+1,
+    verificarAdjacenciasFlechaCelula(VerificarAbaixo, 1, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(1, VerificarDireita, Matriz, Valor).
+
+verificarAdjacenciasFlecha(1,       Tamanho, Matriz,Valor,Tamanho) :- VerificarAbaixo is 1+1, VerificarEsquerda is Tamanho-1, 
+    verificarAdjacenciasFlechaCelula(VerificarAbaixo, Tamanho, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(1, VerificarEsquerda, Matriz, Valor).
+
+verificarAdjacenciasFlecha(Tamanho, 1,       Matriz,Valor,Tamanho) :- VerificarDireita is 1+1, VerificarAcima is Tamanho-1,
+    verificarAdjacenciasFlechaCelula(VerificarAcima, 1, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(Tamanho, VerificarDireita, Matriz, Valor).
+
+verificarAdjacenciasFlecha(Tamanho, Tamanho, Matriz,Valor,Tamanho) :- VerificarAcima is Tamanho-1, VerificarEsquerda is Tamanho-1,
+    verificarAdjacenciasFlechaCelula(VerificarAcima, Tamanho, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(Tamanho, VerificarEsquerda, Matriz, Valor).
+
+verificarAdjacenciasFlecha(1,       Coluna,  Matriz,Valor,Tamanho) :- Coluna < Tamanho, VerificarAbaixo is 1+1, VerificarEsquerda is Coluna-1, VerificarDireita is Coluna+1,
+    verificarAdjacenciasFlechaCelula(VerificarAbaixo, Coluna, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(1, VerificarEsquerda, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(1, VerificarDireita, Matriz, Valor).
+
+verificarAdjacenciasFlecha(Tamanho, Coluna,  Matriz,Valor,Tamanho) :- Coluna < Tamanho, VerificarAcima is Tamanho-1, VerificarEsquerda is Coluna-1, VerificarDireita is Coluna+1,
+    verificarAdjacenciasFlechaCelula(VerificarAcima, Coluna, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(Tamanho, VerificarEsquerda, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(Tamanho, VerificarDireita, Matriz, Valor).
+
+verificarAdjacenciasFlecha(Linha,   1,       Matriz,Valor,Tamanho) :- Linha < Tamanho, VerificarDireita is 1+1, VerificarAcima is Linha-1, VerificarAbaixo is Linha+1, 
+    verificarAdjacenciasFlechaCelula(Linha, VerificarDireita, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(VerificarAcima, 1, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(VerificarAbaixo, 1, Matriz, Valor).
+
+verificarAdjacenciasFlecha(Linha,   Tamanho, Matriz,Valor,Tamanho) :- Linha < Tamanho, VerificarEsquerda is Tamanho-1, VerificarAcima is Linha-1, VerificarAbaixo is Linha+1,
+    verificarAdjacenciasFlechaCelula(Linha, VerificarEsquerda, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(VerificarAcima, Tamanho, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(VerificarAbaixo), Tamanho, Matriz, Valor).
+
+verificarAdjacenciasFlecha(Linha,   Coluna,  Matriz,Valor,Tamanho) :- Linha < Tamanho, Coluna < Tamanho, VerificarDireita is Coluna+1, VerificarEsquerda is Coluna-1, VerificarAbaixo is Linha+1, VerificarAcima is Linha-1,
+    verificarAdjacenciasFlechaCelula(Linha, VerificarDireita, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(Linha, VerificarEsquerda, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(VerificarAbaixo, Coluna, Matriz, Valor), 
+    verificarAdjacenciasFlechaCelula(VerificarAcima, Coluna, Matriz, Valor).
 
 
 verificarAdjacenciasFlechaCelula(Linha, Coluna, Matriz, Valor) :-
-    nth0((Linha-1), Matriz, LinhaElemento),
-    nth0((Coluna-1), LinhaElemento, Elemento),
+    NovaLinha is Linha-1, nth0(NovaLinha, Matriz, LinhaElemento),
+    NovaColuna is Coluna-1, nth0(NovaColuna, LinhaElemento, Elemento),
     verificarAdjacenciasFlechaElemento(Elemento, ValorElemento),
     ValorElemento < Valor.
 
