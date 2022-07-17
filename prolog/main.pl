@@ -121,9 +121,13 @@ completa(cell(_,_,0,_), _).
 completa(cell(Linha,Coluna,Region,Value), Matriz) :-
     acharQuantidadeElementosRegiao(Region, Matriz, QuantidadeElementosRegiao),
     my_in(Value, 1, QuantidadeElementosRegiao),
+    verifica(Linha,Coluna,Value, Region, Matriz).
+
+verifica(Linha,Coluna,Value,Region,Matriz) :-
+    (member(Value,[0]) ,
     naoHaIgualNaRegiao(Linha,Coluna,Value, Region, Matriz),
     verificarAdjacencias(Matriz),
-    verificarFlechasMatriz(Matriz, Matriz).
+    verificarFlechasMatriz(Matriz, Matriz)).
 
 my_in(Value, Maior, Maior) :- Value is Maior.
 my_in(Value, Menor, Maior) :- Value is Menor ; my_in(Value, (Menor+1), Maior).
